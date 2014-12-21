@@ -3,18 +3,22 @@
 \alias{fuzzyforest}
 \title{Fits fuzzy forest algorithm.}
 \usage{
-fuzzyforest(X, y, module_membership, proportion_kept, screening_mtry,
-  selection_mtry)
+fuzzyforest(X, y, module_membership, proportion_dropped, proportion_kept,
+  screening_mtry, selection_mtry)
 }
 \arguments{
-\item{X}{A data.frame with feature vectors.}
+\item{X}{A data.frame.  Each column corresponds to a feature vectors.}
 
 \item{y}{Response vector.}
 
-\item{module_membership}{A data.frame giving the module membership of each
-feature.
-The first column gives the name of feature.
-The second column gives the name of partition.}
+\item{module_membership}{A data.frame with number of rows equal to
+\code{ncol(X)}.
+The first column gives the name of module.
+The second column gives the module membership
+of feature.}
+
+\item{proportion_dropped}{A number between 0 and 1.  The proportion dropped
+at each stage of the iterative random forests.}
 
 \item{proportion_kept}{A number between 0 and 1. The percent of features
 kept at each iteration of random forest during the
@@ -28,6 +32,9 @@ is set to \code{p_current*screening_mtry} where
 step is set to \code{num_survivors*selection_mtry}
 where \code{num_survivors} is the number features
 that have survived the initial screening step.}
+
+\item{ntree_factor}{A number greater than 1.  \code{ntree} for each random
+is \code{ntree_factor} times the number of features.}
 }
 \description{
 Fits fuzzy forest algorithm.  Returns
