@@ -2,7 +2,7 @@
 #'
 #' Fits fuzzy forest algorithm.  Returns
 #' fuzzy forest object.
-#'
+#' @export
 #' @param X A data.frame with feature vectors.
 #' @param y Response vector.
 #' @param module_membership A data.frame giving the module membership of each
