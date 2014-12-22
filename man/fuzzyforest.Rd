@@ -3,11 +3,12 @@
 \alias{fuzzyforest}
 \title{Fits fuzzy forest algorithm.}
 \usage{
-fuzzyforest(X, y, module_membership, proportion_dropped, proportion_kept,
-  screening_mtry, selection_mtry)
+fuzzyforest(X, y, module_membership, drop_fraction, stop_fraction,
+  screening_mtry, selection_mtry, ntree_factor = 10, num_processors = 1)
 }
 \arguments{
-\item{X}{A data.frame.  Each column corresponds to a feature vectors.}
+\item{X}{A data.frame.
+Each column corresponds to a feature vectors.}
 
 \item{y}{Response vector.}
 
@@ -17,12 +18,11 @@ The first column gives the name of module.
 The second column gives the module membership
 of feature.}
 
-\item{proportion_dropped}{A number between 0 and 1.  The proportion dropped
-at each stage of the iterative random forests.}
+\item{drop_fraction}{A number between 0 and 1.  Percentage of features
+dropped at each iteration.}
 
-\item{proportion_kept}{A number between 0 and 1. The percent of features
-kept at each iteration of random forest during the
-screening step.}
+\item{stop_fraction}{A number between 0 and 1. Proportion features
+from each module to retain at screening step.}
 
 \item{screening_mtry}{A number between 0 and 1.  Mtry for each random forest
 is set to \code{p_current*screening_mtry} where
@@ -35,6 +35,8 @@ that have survived the initial screening step.}
 
 \item{ntree_factor}{A number greater than 1.  \code{ntree} for each random
 is \code{ntree_factor} times the number of features.}
+
+\item{num_processors}{Number of processors used to fit random forests.}
 }
 \description{
 Fits fuzzy forest algorithm.  Returns

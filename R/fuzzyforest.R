@@ -7,5 +7,7 @@
 #' @docType package
 #' @import randomForest
 #' @import WGCNA
+#' @import foreach
+#' @import doParallel
 #' @name fuzzyforests
 NULL
