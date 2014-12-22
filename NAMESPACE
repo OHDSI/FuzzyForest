@@ -2,4 +2,6 @@
 
 export(fuzzyforest)
 import(WGCNA)
+import(doParallel)
+import(foreach)
 import(randomForest)
