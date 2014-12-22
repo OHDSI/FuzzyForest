@@ -14,4 +14,7 @@ License: GPL-3
 LazyData: true
 Imports:
     randomForest,
-    WGCNA
+    WGCNA,
+    foreach,
+    doParallel,
+    parallel
