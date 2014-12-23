@@ -44,24 +44,34 @@ fuzzyforest <- function(X, y, module_membership,
     #TUNING PARAMETER ntree_factor
     ntree <- num_features*ntree_factor
     #TUNING PARAMETER stop_fraction
-    cutoff = ceiling(num_features * stop_fraction)
-    while (num_features > cutoff){
+    target = ceiling(num_features * stop_fraction)
+    while (num_features >= target){
       rf = `%dopar%`(foreach(ntree = rep(ntree/num_processors, num_processors)
                      , .combine = combine, .packages = 'randomForest'),
                      #second argument to '%dopar%'
                      randomForest(module , y, ntree = ntree, mtry = mtry,
                      importance = TRUE, scale = FALSE))
       var_importance <- rf$importance
-      quantile <- quantile(var_importance[,1], drop_fraction)
-      trimmed_varlist <- var_importance[var_importance[, 1] > quantile, ]
-      features <- row.names(trimmed_varlist)
-      module <- module[, which(names(module) %in% features)]
-      num_features <- length(features)
-      mtry <- screening_mtry*num_features
-      ntree <- num_features*ntree_factor
+      var_importance <- var_importance[order(var_importance[, 1],
+                                             decreasing=TRUE), ]
+      reduction <- ceiling(num_features*drop_fraction)
+      if(num_features - reduction > target) {
+          trimmed_varlist <- var_importance[1:(num_features - reduction), ]
+          features <- row.names(trimmed_varlist)
+          module <- module[, which(names(module) %in% features)]
+          num_features <- length(features)
+          mtry <- screening_mtry*num_features
+          ntree <- num_features*ntree_factor
+        }
+      else {
+          num_features <- target - 1
+          mod_varlist <- var_importance[, 1][1:target]
+          features <- row.names(var_importance)[1:target]
+          survivors[[i]] <- cbind(features, mod_varlist)
+        }
     }
-    survivors[[i]] <- cbind(features, trimmed_varlist[, 1])
   }
+  parallel::stopCluster(cl)
   survivors <- do.call('rbind', survivors)
   survivors <- as.data.frame(survivors, stringsAsFactors = FALSE)
   survivors[, 2] <- as.numeric(survivors[, 2])
