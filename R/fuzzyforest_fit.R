@@ -25,8 +25,8 @@
 #' @note This work was partially funded by NSF IIS 1251151.
 fuzzyforest <- function(X, y, module_membership,
                         drop_fraction, stop_fraction,
-                        mtry_fraction, selection_mtry,
-                        ntree_factor=10, num_processors=1) {
+                        mtry_fraction, ntree_factor=10,
+                        num_processors=1) {
   module_membership[, 1] <- as.character(module_membership[, 1])
   module_membership[, 2] <- as.character(module_membership[, 2])
   module_list <- unique(module_membership[, 1])

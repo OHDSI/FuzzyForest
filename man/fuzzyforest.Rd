@@ -4,7 +4,7 @@
 \title{Fits fuzzy forest algorithm.}
 \usage{
 fuzzyforest(X, y, module_membership, drop_fraction, stop_fraction,
-  mtry_fraction, selection_mtry, ntree_factor = 10, num_processors = 1)
+  mtry_fraction, ntree_factor = 10, num_processors = 1)
 }
 \arguments{
 \item{X}{A data.frame.
