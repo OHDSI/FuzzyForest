@@ -6,11 +6,6 @@
 #' @param X                 A data.frame.
 #'                          Each column corresponds to a feature vectors.
 #' @param y                 Response vector.
-#' @param module_membership A data.frame with number of rows equal to
-#'                          \code{ncol(X)}.
-#'                          The first column gives the name of module.
-#'                          The second column gives the module membership
-#'                          of feature.
 #' @param drop_fraction     A number between 0 and 1.  Percentage of features
 #'                          dropped at each iteration.
 #' @param stop_fraction     A number between 0 and 1. Proportion features

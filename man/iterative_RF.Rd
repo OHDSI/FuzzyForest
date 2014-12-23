@@ -26,12 +26,6 @@ is set to \code{p_current*mtry_fraction} where
 is \code{ntree_factor} times the number of features.}
 
 \item{num_processors}{Number of processors used to fit random forests.}
-
-\item{module_membership}{A data.frame with number of rows equal to
-\code{ncol(X)}.
-The first column gives the name of module.
-The second column gives the module membership
-of feature.}
 }
 \value{
 A data.frame with the top ranked features.
