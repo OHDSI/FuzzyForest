@@ -21,6 +21,7 @@
 #' @param ntree_factor      A number greater than 1.  \code{ntree} for each random
 #'                          is \code{ntree_factor} times the number of features.
 #' @param num_processors    Number of processors used to fit random forests.
+#' @return A data.frame with the top ranked features.
 #' @note This work was partially funded by NSF IIS 1251151.
 iterative_RF <- function(X, y, drop_fraction, stop_fraction, mtry_fraction,
                          ntree_factor = 10, num_processors = 2) {

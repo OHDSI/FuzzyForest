@@ -21,6 +21,7 @@
 #' @param ntree_factor      A number greater than 1.  \code{ntree} for each random
 #'                          is \code{ntree_factor} times the number of features.
 #' @param num_processors    Number of processors used to fit random forests.
+#' @return A data.frame with the top ranked features.
 #' @note This work was partially funded by NSF IIS 1251151.
 fuzzyforest <- function(X, y, module_membership,
                         drop_fraction, stop_fraction,

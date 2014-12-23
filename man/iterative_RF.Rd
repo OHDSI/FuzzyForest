@@ -33,6 +33,9 @@ The first column gives the name of module.
 The second column gives the module membership
 of feature.}
 }
+\value{
+A data.frame with the top ranked features.
+}
 \description{
 Fits iterative random forest algorithm.  Returns
 data.frame with variable importances and top rated features.

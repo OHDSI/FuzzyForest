@@ -4,7 +4,7 @@
 \title{Fits fuzzy forest algorithm.}
 \usage{
 fuzzyforest(X, y, module_membership, drop_fraction, stop_fraction,
-  screening_mtry, selection_mtry, ntree_factor = 10, num_processors = 1)
+  mtry_fraction, selection_mtry, ntree_factor = 10, num_processors = 1)
 }
 \arguments{
 \item{X}{A data.frame.
@@ -24,19 +24,17 @@ dropped at each iteration.}
 \item{stop_fraction}{A number between 0 and 1. Proportion features
 from each module to retain at screening step.}
 
-\item{screening_mtry}{A number between 0 and 1.  Mtry for each random forest
-is set to \code{p_current*screening_mtry} where
+\item{mtry_fraction}{A number between 0 and 1.  Mtry for each random forest
+is set to \code{p_current*mtry_fraction} where
 \code{p_current} is the current number of features.}
-
-\item{selection_mtry}{A number betwee 0 and 1.  Mtry for final selection
-step is set to \code{num_survivors*selection_mtry}
-where \code{num_survivors} is the number features
-that have survived the initial screening step.}
 
 \item{ntree_factor}{A number greater than 1.  \code{ntree} for each random
 is \code{ntree_factor} times the number of features.}
 
 \item{num_processors}{Number of processors used to fit random forests.}
+}
+\value{
+A data.frame with the top ranked features.
 }
 \description{
 Fits fuzzy forest algorithm.  Returns
