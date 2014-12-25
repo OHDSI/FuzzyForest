@@ -14,18 +14,23 @@
 #'                          is set to
 #'                          \code{ceiling}(\eqn{\sqrt{p}}\code{mtry_factor})
 #'                          where \code{p} is the current number of features.
-#' @param ntree_factor      A number greater than 1.  \code{ntree} for each random
-#'                          is \code{ntree_factor} times the number of features.
+#' @param ntree_factor      A number greater than 1.  \code{ntree} for each
+#'                          random is \code{ntree_factor} times the number
+#'                          of features.  For each random forest, \code{ntree}
+#'                          is set to \code{max}(\code{min_ntree},
+#'                          \code{ntree_factor}*\code{p}).
+#' @param min_ntree         Minimum number of trees grown in each random forest.
 #' @param num_processors    Number of processors used to fit random forests.
 #' @return A data.frame with the top ranked features.
 #' @note This work was partially funded by NSF IIS 1251151.
 iterative_RF <- function(X, y, drop_fraction, stop_fraction, mtry_factor,
-                         ntree_factor = 10, num_processors = 1) {
+                         ntree_factor = 10, min_ntree=5000,
+                         num_processors = 1) {
   cl = parallel::makeCluster(num_processors)
   doParallel::registerDoParallel(cl)
   num_features <- ncol(X)
   mtry <- ceiling(mtry_factor*sqrt(num_features))
-  ntree <- num_features*ntree_factor
+  ntree <- max(num_features*ntree_factor, min_ntree)
   target <- ceiling(num_features * stop_fraction)
   current_X <- X
   while (num_features >= target){
@@ -44,7 +49,7 @@ iterative_RF <- function(X, y, drop_fraction, stop_fraction, mtry_factor,
       module <- current_X[, which(names(current_X) %in% features)]
       num_features <- length(features)
       mtry <- ceiling(mtry_factor*sqrt(num_features))
-      ntree <- num_features*ntree_factor
+      ntree <- max(num_features*ntree_factor, min_ntree)
     }
     else {
       num_features <- target - 1

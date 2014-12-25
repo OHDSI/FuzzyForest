@@ -3,8 +3,8 @@
 \alias{iterative_RF}
 \title{Fits iterative random forest algorithm.}
 \usage{
-iterative_RF(X, y, drop_fraction, stop_fraction, mtry_fraction,
-  ntree_factor = 10, num_processors = 2)
+iterative_RF(X, y, drop_fraction, stop_fraction, mtry_factor,
+  ntree_factor = 10, min_ntree = 5000, num_processors = 1)
 }
 \arguments{
 \item{X}{A data.frame.
@@ -18,12 +18,18 @@ dropped at each iteration.}
 \item{stop_fraction}{A number between 0 and 1. Proportion features
 from each module to retain at screening step.}
 
-\item{mtry_fraction}{A number between 0 and 1.  Mtry for each random forest
-is set to \code{p_current*mtry_fraction} where
-\code{p_current} is the current number of features.}
+\item{mtry_factor}{A positive number.  Mtry for each random forest
+is set to
+\code{ceiling}(\eqn{\sqrt{p}}\code{mtry_factor})
+where \code{p} is the current number of features.}
 
-\item{ntree_factor}{A number greater than 1.  \code{ntree} for each random
-is \code{ntree_factor} times the number of features.}
+\item{ntree_factor}{A number greater than 1.  \code{ntree} for each
+random is \code{ntree_factor} times the number
+of features.  For each random forest, \code{ntree}
+is set to \code{max}(\code{min_ntree},
+\code{ntree_factor}*\code{p}).}
+
+\item{min_ntree}{Minimum number of trees grown in each random forest.}
 
 \item{num_processors}{Number of processors used to fit random forests.}
 }

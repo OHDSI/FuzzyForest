@@ -21,13 +21,17 @@
 #'                          where \code{p} is the current number of features.
 #' @param ntree_factor      A number greater than 1.  \code{ntree} for each
 #'                          random is \code{ntree_factor} times the number
-#'                          of features.
+#'                          of features.  For each random forest, \code{ntree}
+#'                          is set to \code{max}(\code{min_ntree},
+#'                          \code{ntree_factor}*\code{p}).
+#' @param min_ntree         Minimum number of trees grown in each random forest.
 #' @param num_processors    Number of processors used to fit random forests.
 #' @return A data.frame with the top ranked features.
 #' @note This work was partially funded by NSF IIS 1251151.
 fuzzyforest <- function(X, y, module_membership,
                         drop_fraction=.25, stop_fraction=.05,
-                        mtry_factor=1, ntree_factor=10, num_processors=1) {
+                        mtry_factor=1, ntree_factor=10, min_ntree=5000,
+                        num_processors=1) {
   module_membership[, 1] <- as.character(module_membership[, 1])
   module_membership[, 2] <- as.character(module_membership[, 2])
   module_list <- unique(module_membership[, 1])
@@ -40,7 +44,7 @@ fuzzyforest <- function(X, y, module_membership,
     #TUNING PARAMETER mtry_factor
     mtry <- ceiling(mtry_factor*sqrt(num_features))
     #TUNING PARAMETER ntree_factor
-    ntree <- num_features*ntree_factor
+    ntree <- max(num_features*ntree_factor, min_ntree)
     #TUNING PARAMETER stop_fraction
     target = ceiling(num_features * stop_fraction)
     while (num_features >= target){
@@ -59,7 +63,7 @@ fuzzyforest <- function(X, y, module_membership,
           module <- module[, which(names(module) %in% features)]
           num_features <- length(features)
           mtry <- mtry_factor*sqrt(num_features)
-          ntree <- num_features*ntree_factor
+          ntree <- max(num_features*ntree_factor, min_ntree)
         }
       else {
           num_features <- target - 1
@@ -75,9 +79,9 @@ fuzzyforest <- function(X, y, module_membership,
   survivors[, 2] <- as.numeric(survivors[, 2])
   names(survivors) <- c("featureID", "Permutation VIM")
   X_surv <- X[, names(X) %in% survivors[,1]]
-  out <- iterative_RF(X_surv, y, stop_fraction,
-                      mtry_factor, ntree_factor,
-                      num_processors)
+  out <- iterative_RF(X_surv, y, drop_fraction,
+                      stop_fraction, mtry_factor, ntree_factor,
+                      min_ntree, num_processors)
   return(out)
 }
 
