@@ -11,6 +11,7 @@
 #'                          The first column gives the name of module.
 #'                          The second column gives the module membership
 #'                          of feature.
+#' @param number_selected   Number of features selected by fuzzyforest.
 #' @param drop_fraction     A number between 0 and 1.  Percentage of features
 #'                          dropped at each iteration.
 #' @param stop_fraction     A number between 0 and 1. Proportion features
@@ -28,7 +29,7 @@
 #' @param num_processors    Number of processors used to fit random forests.
 #' @return A data.frame with the top ranked features.
 #' @note This work was partially funded by NSF IIS 1251151.
-fuzzyforest <- function(X, y, module_membership,
+fuzzyforest <- function(X, y, module_membership, number_selected=5,
                         drop_fraction=.25, stop_fraction=.05,
                         mtry_factor=1, ntree_factor=10, min_ntree=5000,
                         num_processors=1) {
@@ -79,8 +80,8 @@ fuzzyforest <- function(X, y, module_membership,
   survivors[, 2] <- as.numeric(survivors[, 2])
   names(survivors) <- c("featureID", "Permutation VIM")
   X_surv <- X[, names(X) %in% survivors[,1]]
-  out <- iterative_RF(X_surv, y, drop_fraction,
-                      stop_fraction, mtry_factor, ntree_factor,
+  out <- screen_RF(X_surv, y, drop_fraction,
+                      number_selected=5, mtry_factor, ntree_factor,
                       min_ntree, num_processors)
   return(out)
 }

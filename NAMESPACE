@@ -2,6 +2,7 @@
 
 export(fuzzyforest)
 export(iterative_RF)
+export(screen_RF)
 import(WGCNA)
 import(doParallel)
 import(foreach)
