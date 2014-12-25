@@ -26,8 +26,8 @@
 #' @return A data.frame with the top ranked features.
 #' @note This work was partially funded by NSF IIS 1251151.
 fuzzyforest <- function(X, y, module_membership,
-                        drop_fraction, stop_fraction,
-                        mtry_factor, min_ntree=10000, num_processors=1) {
+                        drop_fraction=.25, stop_fraction=.05,
+                        mtry_factor=1, ntree_factor=10, num_processors=1) {
   module_membership[, 1] <- as.character(module_membership[, 1])
   module_membership[, 2] <- as.character(module_membership[, 2])
   module_list <- unique(module_membership[, 1])
@@ -38,7 +38,7 @@ fuzzyforest <- function(X, y, module_membership,
     module <- X[, which(module_membership[, 1] == module_list[i])]
     num_features <- ncol(module)
     #TUNING PARAMETER mtry_factor
-    mtry <- mtry_factor*sqrt(num_features)
+    mtry <- ceiling(mtry_factor*sqrt(num_features))
     #TUNING PARAMETER ntree_factor
     ntree <- num_features*ntree_factor
     #TUNING PARAMETER stop_fraction
@@ -58,7 +58,7 @@ fuzzyforest <- function(X, y, module_membership,
           features <- row.names(trimmed_varlist)
           module <- module[, which(names(module) %in% features)]
           num_features <- length(features)
-          mtry <- mtry_factor*num_features
+          mtry <- mtry_factor*sqrt(num_features)
           ntree <- num_features*ntree_factor
         }
       else {
