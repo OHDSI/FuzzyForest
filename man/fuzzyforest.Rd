@@ -3,8 +3,8 @@
 \alias{fuzzyforest}
 \title{Fits fuzzy forest algorithm.}
 \usage{
-fuzzyforest(X, y, module_membership, drop_fraction, stop_fraction,
-  mtry_fraction, ntree_factor = 10, num_processors = 1)
+fuzzyforest(X, y, module_membership, drop_fraction, stop_fraction, mtry_factor,
+  ntree_factor = 10, num_processors = 1)
 }
 \arguments{
 \item{X}{A data.frame.
@@ -24,9 +24,9 @@ dropped at each iteration.}
 \item{stop_fraction}{A number between 0 and 1. Proportion features
 from each module to retain at screening step.}
 
-\item{mtry_fraction}{A number between 0 and 1.  Mtry for each random forest
-is set to \code{p_current*mtry_fraction} where
-\code{p_current} is the current number of features.}
+\item{mtry_factor}{A positive number.  Mtry for each random forest
+is set to \code{ceiling}(\eqn{\sqrt{p}}\code{mtry_factor})
+where \code{p} is the current number of features.}
 
 \item{ntree_factor}{A number greater than 1.  \code{ntree} for each random
 is \code{ntree_factor} times the number of features.}

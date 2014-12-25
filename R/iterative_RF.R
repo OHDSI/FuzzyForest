@@ -18,12 +18,12 @@
 #' @param num_processors    Number of processors used to fit random forests.
 #' @return A data.frame with the top ranked features.
 #' @note This work was partially funded by NSF IIS 1251151.
-iterative_RF <- function(X, y, drop_fraction, stop_fraction, mtry_fraction,
+iterative_RF <- function(X, y, drop_fraction, stop_fraction, mtry_factor,
                          ntree_factor = 10, num_processors = 2) {
   cl = parallel::makeCluster(num_processors)
   doParallel::registerDoParallel(cl)
   num_features <- ncol(X)
-  mtry <- mtry_fraction*num_features
+  mtry <- mtry_factor*sqrt(num_features)
   ntree <- num_features*ntree_factor
   target <- ceiling(num_features * stop_fraction)
   current_X <- X
@@ -42,7 +42,7 @@ iterative_RF <- function(X, y, drop_fraction, stop_fraction, mtry_fraction,
       features <- row.names(trimmed_varlist)
       module <- current_X[, which(names(current_X) %in% features)]
       num_features <- length(features)
-      mtry <- mtry_fraction*num_features
+      mtry <- mtry_factor*sqrt(num_features)
       ntree <- num_features*ntree_factor
     }
     else {
