@@ -6,11 +6,7 @@
 #' @param X                 A data.frame.
 #'                          Each column corresponds to a feature vectors.
 #' @param y                 Response vector.
-#' @param module_membership A data.frame with number of rows equal to
-#'                          \code{ncol(X)}.
-#'                          The first column gives the name of module.
-#'                          The second column gives the module membership
-#'                          of feature.
+#' @param module_membership A vector giving module membership of each feature.
 #' @param number_selected   Number of features selected by fuzzyforest.
 #' @param drop_fraction     A number between 0 and 1.  Percentage of features
 #'                          dropped at each iteration.
@@ -33,14 +29,12 @@ fuzzyforest <- function(X, y, module_membership, number_selected=5,
                         drop_fraction=.25, stop_fraction=.05,
                         mtry_factor=1, ntree_factor=10, min_ntree=5000,
                         num_processors=1) {
-  module_membership[, 1] <- as.character(module_membership[, 1])
-  module_membership[, 2] <- as.character(module_membership[, 2])
-  module_list <- unique(module_membership[, 1])
+  module_list <- unique(module_membership)
   cl = parallel::makeCluster(num_processors)
   doParallel::registerDoParallel(cl)
   survivors <- vector('list', length(module_list))
   for (i in 1:length(module_list)) {
-    module <- X[, which(module_membership[, 1] == module_list[i])]
+    module <- X[, which(module_membership == module_list[i])]
     num_features <- ncol(module)
     #TUNING PARAMETER mtry_factor
     mtry <- ceiling(mtry_factor*sqrt(num_features))
