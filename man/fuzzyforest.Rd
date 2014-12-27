@@ -13,11 +13,7 @@ Each column corresponds to a feature vectors.}
 
 \item{y}{Response vector.}
 
-\item{module_membership}{A data.frame with number of rows equal to
-\code{ncol(X)}.
-The first column gives the name of module.
-The second column gives the module membership
-of feature.}
+\item{module_membership}{A vector giving module membership of each feature.}
 
 \item{number_selected}{Number of features selected by fuzzyforest.}
 
