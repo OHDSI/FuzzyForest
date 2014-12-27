@@ -87,7 +87,7 @@ iterative_RF <- function(X, y, drop_fraction, stop_fraction, mtry_factor,
 #' @param num_processors    Number of processors used to fit random forests.
 #' @return A data.frame with the top ranked features.
 #' @note This work was partially funded by NSF IIS 1251151.
-screen_RF <- function(X, y, drop_fraction, number_selected=5, mtry_factor,
+select_RF <- function(X, y, drop_fraction, number_selected=5, mtry_factor,
                       ntree_factor = 10, min_ntree=5000,
                       num_processors = 1) {
   cl = parallel::makeCluster(num_processors)

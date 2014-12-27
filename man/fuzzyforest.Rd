@@ -4,8 +4,8 @@
 \title{Fits fuzzy forest algorithm.}
 \usage{
 fuzzyforest(X, y, module_membership, number_selected = 5,
-  drop_fraction = 0.25, stop_fraction = 0.05, mtry_factor = 1,
-  ntree_factor = 10, min_ntree = 5000, num_processors = 1)
+  screen_control = screen_control(), select_control = select_control(),
+  num_processors = 1)
 }
 \arguments{
 \item{X}{A data.frame.
@@ -17,24 +17,9 @@ Each column corresponds to a feature vectors.}
 
 \item{number_selected}{Number of features selected by fuzzyforest.}
 
-\item{drop_fraction}{A number between 0 and 1.  Percentage of features
-dropped at each iteration.}
+\item{screen_control}{A screen control object.}
 
-\item{stop_fraction}{A number between 0 and 1. Proportion features
-from each module to retain at screening step.}
-
-\item{mtry_factor}{A positive number.  Mtry for each random forest
-is set to
-\code{ceiling}(\eqn{\sqrt{p}}\code{mtry_factor})
-where \code{p} is the current number of features.}
-
-\item{ntree_factor}{A number greater than 1.  \code{ntree} for each
-random is \code{ntree_factor} times the number
-of features.  For each random forest, \code{ntree}
-is set to \code{max}(\code{min_ntree},
-\code{ntree_factor}*\code{p}).}
-
-\item{min_ntree}{Minimum number of trees grown in each random forest.}
+\item{select_control}{A selection control object}
 
 \item{num_processors}{Number of processors used to fit random forests.}
 }
