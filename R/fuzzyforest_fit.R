@@ -7,15 +7,17 @@
 #'                          Each column corresponds to a feature vectors.
 #' @param y                 Response vector.
 #' @param module_membership A vector giving module membership of each feature.
-#' @param screen_control    A screen control object.
-#' @param select_control    A selection control object
+#' @param screen_params    A screen control object.
+#' @param select_params    A selection control object
 #' @param num_processors    Number of processors used to fit random forests.
 #' @return A data.frame with the top ranked features.
 #' @note This work was partially funded by NSF IIS 1251151.
 fuzzyforest <- function(X, y, module_membership,
-                        screen_control = screen_control(),
-                        select_control = select_control(),
+                        screen_params = screen_control(min_ntree=100),
+                        select_params = select_control(min_ntree=100),
                         num_processors=1) {
+  screen_control <- screen_params
+  select_control <-  select_params
   module_list <- unique(module_membership)
   cl = parallel::makeCluster(num_processors)
   doParallel::registerDoParallel(cl)
@@ -87,16 +89,21 @@ fuzzyforest <- function(X, y, module_membership,
 #' @param X                 A data.frame.
 #'                          Each column corresponds to a feature vectors.
 #' @param y                 Response vector.
-#' @param WGCNA_control     An object of class WGCNA_control.
-#' @param screen_control    An object of class screen_control.
-#' @param select_control    An object of class selection_control.
+#' @param WGCNA_params     An object of class WGCNA_control.
+#' @param screen_params    An object of class screen_control.
+#' @param select_params    An object of class selection_control.
 #' @param num_processors    Number of processors.
 #' @return A data.frame with the top ranked features.
 #' @note This work was partially funded by NSF IIS 1251151.
-WGCNA_fuzzyforest <- function(X, y, WGCNA_control=WGCNA_control(power=6),
-                        screen_control=screen_control(stop_fraction=.05),
-                        select_control=select_control(number_selected=10), num_processors=1) {
+WGCNA_fuzzyforest <- function(X, y, WGCNA_params=WGCNA_control(p=6),
+                        screen_params=screen_control(min_ntree=100),
+                        select_params=select_control(min_ntree=100),
+                        num_processors=1) {
 
+  #browser()
+  WGCNA_control <- WGCNA_params
+  screen_control <- screen_params
+  select_control <-  select_params
   WGCNA_args <- list(X,WGCNA_control$power)
   WGCNA_args <- c(WGCNA_args, WGCNA_control$extra_args)
   names(WGCNA_args) <- c("datExpr", "power", names(WGCNA_control$extra_args))
