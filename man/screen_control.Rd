@@ -17,12 +17,13 @@ from each module to retain at screening step.}
 \item{mtry_factor}{\code{mtry} is set to
 \eqn{\sqrt(p)}*\code{mtry_factor}.}
 
-\item{min_ntree}{Set minimum value for \code{ntree} in each random
-forest}
+\item{min_ntree}{Minimum number of trees grown in each random forest.}
 
 \item{ntree_factor}{A number greater than 1.  \code{ntree} for each
 random is \code{ntree_factor} times the number
-of features.}
+of features.  For each random forest, \code{ntree}
+is set to \code{max}(\code{min_ntree},
+\code{ntree_factor}*\code{p}).}
 }
 \value{
 An object of type screen_control.

@@ -3,9 +3,8 @@
 \alias{fuzzyforest}
 \title{Fits fuzzy forest algorithm.}
 \usage{
-fuzzyforest(X, y, module_membership, number_selected = 5,
-  screen_control = screen_control(), select_control = select_control(),
-  num_processors = 1)
+fuzzyforest(X, y, module_membership, screen_control = screen_control(),
+  select_control = select_control(), num_processors = 1)
 }
 \arguments{
 \item{X}{A data.frame.
@@ -14,8 +13,6 @@ Each column corresponds to a feature vectors.}
 \item{y}{Response vector.}
 
 \item{module_membership}{A vector giving module membership of each feature.}
-
-\item{number_selected}{Number of features selected by fuzzyforest.}
 
 \item{screen_control}{A screen control object.}
 

@@ -3,16 +3,15 @@
 \alias{WGCNA_fuzzyforest}
 \title{Fits WGCNA based fuzzy forest algorithm.}
 \usage{
-WGCNA_fuzzyforest(X, y, number_selected, WGCNA_control = WGCNA_control(power =
-  6), screen_control = NULL, select_control = NULL, num_processors = NULL)
+WGCNA_fuzzyforest(X, y, WGCNA_control = WGCNA_control(power = 6),
+  screen_control = screen_control(stop_fraction = 0.05),
+  select_control = select_control(number_selected = 10), num_processors = 1)
 }
 \arguments{
 \item{X}{A data.frame.
 Each column corresponds to a feature vectors.}
 
 \item{y}{Response vector.}
-
-\item{number_selected}{Number of features selected by algorithm.}
 
 \item{WGCNA_control}{An object of class WGCNA_control.}
 
