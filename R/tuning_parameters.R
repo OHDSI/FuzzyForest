@@ -11,11 +11,12 @@
 #'                          from each module to retain at screening step.
 #' @param mtry_factor       \code{mtry} is set to
 #'                          \eqn{\sqrt(p)}*\code{mtry_factor}.
-#' @param min_ntree         Set minimum value for \code{ntree} in each random
-#'                          forest
 #' @param ntree_factor      A number greater than 1.  \code{ntree} for each
 #'                          random is \code{ntree_factor} times the number
-#'                          of features.
+#'                          of features.  For each random forest, \code{ntree}
+#'                          is set to \code{max}(\code{min_ntree},
+#'                          \code{ntree_factor}*\code{p}).
+#' @param min_ntree         Minimum number of trees grown in each random forest.
 #' @return An object of type screen_control.
 #' @note This work was partially funded by NSF IIS 1251151.
 screen_control <- function(drop_fraction=.25, stop_fraction=.05,
@@ -45,11 +46,12 @@ screen_control <- function(drop_fraction=.25, stop_fraction=.05,
 #' @param mtry_factor       A number between 0 and 1.  Mtry for each random forest
 #'                          is set to \code{p_current*mtry_fraction} where
 #'                          \code{p_current} is the current number of features.
-#' @param min_ntree         Set minimum value for \code{ntree} in each random
-#'                          forest
 #' @param ntree_factor      A number greater than 1.  \code{ntree} for each
 #'                          random is \code{ntree_factor} times the number
-#'                          of features.
+#'                          of features.  For each random forest, \code{ntree}
+#'                          is set to \code{max}(\code{min_ntree},
+#'                          \code{ntree_factor}*\code{p}).
+#' @param min_ntree         Minimum number of trees grown in each random forest.
 #' @return An object of type selection_control.
 #' @note This work was partially funded by NSF IIS 1251151.
 select_control <- function(drop_fraction=.25, number_selected=5,
