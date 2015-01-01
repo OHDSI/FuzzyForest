@@ -73,6 +73,8 @@ fuzzyforest <- function(X, y, module_membership,
   out[, 2] <- round(as.numeric(out[, 2]), 4)
   row.names(out) <- NULL
   colnames(out) <- c("feature_name", "variable_importance")
+  out <- as.data.frame(out, stringsAsFactors=FALSE)
+  out[, 2] <- as.numeric(out[, 2])
   return(out)
 }
 
