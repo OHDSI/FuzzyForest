@@ -3,8 +3,9 @@
 \alias{fuzzyforest}
 \title{Fits fuzzy forest algorithm.}
 \usage{
-fuzzyforest(X, y, module_membership, screen_control = screen_control(),
-  select_control = select_control(), num_processors = 1)
+fuzzyforest(X, y, module_membership, screen_params = screen_control(min_ntree
+  = 100), select_params = select_control(min_ntree = 100),
+  num_processors = 1)
 }
 \arguments{
 \item{X}{A data.frame.
@@ -14,9 +15,15 @@ Each column corresponds to a feature vectors.}
 
 \item{module_membership}{A vector giving module membership of each feature.}
 
-\item{screen_control}{A screen control object.}
+\item{screen_params}{Parameters for screening step of fuzzy forests.
+See \code{\link[fuzzyforest]{screen_control}} for details.
+\code{screen_params} is an object of type
+\code{screen_control}.}
 
-\item{select_control}{A selection control object}
+\item{select_params}{Parameters for selection step of fuzzy forests.
+See \code{\link[fuzzyforest]{select_control}} for details.
+\code{select_params} is an object of type
+\code{select_control}.}
 
 \item{num_processors}{Number of processors used to fit random forests.}
 }
@@ -29,5 +36,27 @@ fuzzy forest object.
 }
 \note{
 This work was partially funded by NSF IIS 1251151.
+}
+\examples{
+n <- 500
+minCor = .66
+seed1 <- rnorm(n)
+seed2 <- rnorm(n)
+p <- 100
+X1 <- WGCNA::simulateModule(seed1, nGenes=p/2, minCor=.66, maxCor=.99,
+                     propNegativeCor=.01)
+X2 <- WGCNA::simulateModule(seed2, nGenes=p/2, minCor=.66, maxCor=.99,
+                     propNegativeCor=.01)
+beta1 <- c(c(5, 2, 1, 0, 0), rep(0, p/2-5))
+beta2 <- beta1
+X <- cbind(X1, X2)
+beta <- c(beta1, beta2)
+y <- X\%*\%beta + rnorm(n)
+X <- as.data.frame(X)
+names(X) <- paste("V",1:p,sep="")
+module_membership <- as.character(rep(1:2,each=p/2))
+ff <- fuzzyforest(X, y, module_membership,
+                  screen_params=screen_control(min_ntree=100),
+                  select_params=select_control(number_selected=3, min_ntree=100))
 }
 

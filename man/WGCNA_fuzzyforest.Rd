@@ -3,9 +3,9 @@
 \alias{WGCNA_fuzzyforest}
 \title{Fits WGCNA based fuzzy forest algorithm.}
 \usage{
-WGCNA_fuzzyforest(X, y, WGCNA_control = WGCNA_control(power = 6),
-  screen_control = screen_control(stop_fraction = 0.05),
-  select_control = select_control(number_selected = 10), num_processors = 1)
+WGCNA_fuzzyforest(X, y, WGCNA_params = WGCNA_control(p = 6),
+  screen_params = screen_control(min_ntree = 100),
+  select_params = select_control(min_ntree = 100), num_processors = 1)
 }
 \arguments{
 \item{X}{A data.frame.
@@ -13,11 +13,11 @@ Each column corresponds to a feature vectors.}
 
 \item{y}{Response vector.}
 
-\item{WGCNA_control}{An object of class WGCNA_control.}
+\item{WGCNA_params}{An object of class WGCNA_control.}
 
-\item{screen_control}{An object of class screen_control.}
+\item{screen_params}{An object of class screen_control.}
 
-\item{select_control}{An object of class selection_control.}
+\item{select_params}{An object of class selection_control.}
 
 \item{num_processors}{Number of processors.}
 }
