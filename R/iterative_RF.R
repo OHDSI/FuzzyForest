@@ -8,7 +8,7 @@
 #' @param y                 Response vector.
 #' @param drop_fraction     A number between 0 and 1.  Percentage of features
 #'                          dropped at each iteration.
-#' @param stop_fraction     A number between 0 and 1. Proportion features
+#' @param keep_fraction     A number between 0 and 1. Proportion features
 #'                          from each module to retain at screening step.
 #' @param mtry_factor       A positive number.  Mtry for each random forest
 #'                          is set to
@@ -23,7 +23,7 @@
 #' @param num_processors    Number of processors used to fit random forests.
 #' @return A data.frame with the top ranked features.
 #' @note This work was partially funded by NSF IIS 1251151.
-iterative_RF <- function(X, y, drop_fraction, stop_fraction, mtry_factor,
+iterative_RF <- function(X, y, drop_fraction, keep_fraction, mtry_factor,
                          ntree_factor = 10, min_ntree=5000,
                          num_processors = 1) {
   cl = parallel::makeCluster(num_processors)
@@ -31,7 +31,7 @@ iterative_RF <- function(X, y, drop_fraction, stop_fraction, mtry_factor,
   num_features <- ncol(X)
   mtry <- ceiling(mtry_factor*sqrt(num_features))
   ntree <- max(num_features*ntree_factor, min_ntree)
-  target <- ceiling(num_features * stop_fraction)
+  target <- ceiling(num_features * keep_fraction)
   current_X <- X
   while (num_features >= target){
     rf = `%dopar%`(foreach(ntree = rep(ntree/num_processors, num_processors)

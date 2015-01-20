@@ -7,7 +7,7 @@
 #' @export
 #' @param drop_fraction     A number between 0 and 1.  Percentage of features
 #'                          dropped at each iteration.
-#' @param stop_fraction     A number between 0 and 1. Proportion features
+#' @param keep_fraction     A number between 0 and 1. Proportion features
 #'                          from each module to retain at screening step.
 #' @param mtry_factor       \code{mtry} is set to
 #'                          \eqn{\sqrt(p)}*\code{mtry_factor}.
@@ -19,11 +19,11 @@
 #' @param min_ntree         Minimum number of trees grown in each random forest.
 #' @return An object of type screen_control.
 #' @note This work was partially funded by NSF IIS 1251151.
-screen_control <- function(drop_fraction=.25, stop_fraction=.05,
+screen_control <- function(drop_fraction=.25, keep_fraction=.05,
                            mtry_factor=1, min_ntree=10000, ntree_factor=10) {
   obj <- list()
   obj$drop_fraction <- drop_fraction
-  obj$stop_fraction <- stop_fraction
+  obj$keep_fraction <- keep_fraction
   obj$mtry_factor <- mtry_factor
   obj$min_ntree <- min_ntree
   obj$ntree_factor <- ntree_factor

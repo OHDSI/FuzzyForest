@@ -53,7 +53,7 @@ fuzzyforest <- function(X, y, module_membership,
   mtry_factor <- screen_control$mtry_factor
   ntree_factor <- screen_control$ntree_factor
   min_ntree <- screen_control$min_ntree
-  stop_fraction <- screen_control$stop_fraction
+  keep_fraction <- screen_control$keep_fraction
   for (i in 1:length(module_list)) {
     module <- X[, which(module_membership == module_list[i])]
     num_features <- ncol(module)
@@ -61,8 +61,8 @@ fuzzyforest <- function(X, y, module_membership,
     mtry <- ceiling(mtry_factor*sqrt(num_features))
     #TUNING PARAMETER ntree_factor
     ntree <- max(num_features*ntree_factor, min_ntree)
-    #TUNING PARAMETER stop_fraction
-    target = ceiling(num_features * stop_fraction)
+    #TUNING PARAMETER keep_fraction
+    target = ceiling(num_features * keep_fraction)
     while (num_features >= target){
       rf = `%dopar%`(foreach(ntree = rep(ntree/num_processors, num_processors)
                      , .combine = combine, .packages = 'randomForest'),
@@ -141,7 +141,7 @@ WGCNA_fuzzyforest <- function(X, y, WGCNA_params=WGCNA_control(p=6),
   bwise <- do.call("blockwiseModules", WGCNA_args)
   module_membership <- bwise$colors
   screen_drop_fraction <- screen_control$drop_fraction
-  screen_stop_fraction <- screen_control$stop_fraction
+  screen_keep_fraction <- screen_control$keep_fraction
   screen_mtry_factor <- screen_control$mtry_factor
   screen_ntree_factor <- screen_control$ntree_factor
   screen_min_ntree <- screen_control$min_ntree
