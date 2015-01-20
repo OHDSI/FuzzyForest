@@ -98,12 +98,16 @@ fuzzyforest <- function(X, y, module_membership,
   select_args <- list(X_surv, y, num_processors)
   select_args <- c(select_args, select_control)
   names(select_args)[1:3] <- c("X", "y", "num_processors")
-  out <- do.call("select_RF", select_args)
-  out[, 2] <- round(as.numeric(out[, 2]), 4)
-  row.names(out) <- NULL
-  colnames(out) <- c("feature_name", "variable_importance")
-  out <- as.data.frame(out, stringsAsFactors=FALSE)
-  out[, 2] <- as.numeric(out[, 2])
+  final_list <- do.call("select_RF", select_args)
+  final_list[, 2] <- round(as.numeric(final_list[, 2]), 4)
+  row.names(final_list) <- NULL
+  colnames(final_list) <- c("feature_name", "variable_importance")
+  final_list <- as.data.frame(final_list, stringsAsFactors=FALSE)
+  final_list[, 2] <- as.numeric(final_list[, 2])
+  final_X <- X[, names(X) %in% final_list[, 1]]
+  final_mtry <- floor(select_control$mtry_factor*sqrt(ncol(final_list)))
+  final_rf <- randomForest(x=final_X, y=y, mtry=final_mtry)
+  out <- fuzzy_forest(final_list, final_rf, module_membership)
   return(out)
 }
 
@@ -144,6 +148,7 @@ WGCNA_fuzzyforest <- function(X, y, WGCNA_params=WGCNA_control(p=6),
   out <- fuzzyforest(X, y, module_membership,
                     screen_control, select_control,
                     num_processors)
+  out$WGCNA_object <- bwise
   return(out)
 }
 
