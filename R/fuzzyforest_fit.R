@@ -104,8 +104,9 @@ fuzzyforest <- function(X, y, module_membership,
   colnames(final_list) <- c("feature_name", "variable_importance")
   final_list <- as.data.frame(final_list, stringsAsFactors=FALSE)
   final_list[, 2] <- as.numeric(final_list[, 2])
-  final_X <- X[, names(X) %in% final_list[, 1]]
+  final_X <- X[, names(X) %in% final_list[, 1],drop=FALSE]
   final_mtry <- floor(select_control$mtry_factor*sqrt(ncol(final_list)))
+  #browser()
   final_rf <- randomForest(x=final_X, y=y, mtry=final_mtry)
   out <- fuzzy_forest(final_list, final_rf, module_membership)
   return(out)
