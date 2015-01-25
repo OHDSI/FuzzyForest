@@ -40,8 +40,8 @@
 #' @return A data.frame with the top ranked features.
 #' @note This work was partially funded by NSF IIS 1251151.
 fuzzyforest <- function(X, y, module_membership,
-                        screen_params = screen_control(min_ntree=100),
-                        select_params = select_control(min_ntree=100),
+                        screen_params = screen_control(min_ntree=5000),
+                        select_params = select_control(min_ntree=5000),
                         num_processors=1) {
   screen_control <- screen_params
   select_control <-  select_params
@@ -128,8 +128,8 @@ fuzzyforest <- function(X, y, module_membership,
 #' @return A data.frame with the top ranked features.
 #' @note This work was partially funded by NSF IIS 1251151.
 WGCNA_fuzzyforest <- function(X, y, WGCNA_params=WGCNA_control(p=6),
-                        screen_params=screen_control(min_ntree=100),
-                        select_params=select_control(min_ntree=100),
+                        screen_params=screen_control(min_ntree=5000),
+                        select_params=select_control(min_ntree=5000),
                         num_processors=1) {
 
   #browser()

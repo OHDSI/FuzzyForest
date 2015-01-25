@@ -8,6 +8,7 @@
 #' @param final_rf          The final random forest that was fit by
 #'                          fuzzy forests.
 #' @param module_membership Module membership of each feature.
+#' @param WGCNA_object output of WGCNA analysis.
 #' @return An object of type fuzzy_forest.
 #' @note This work was partially funded by NSF IIS 1251151.
 fuzzy_forest <- function(feature_list, final_rf, module_membership,
@@ -30,7 +31,7 @@ fuzzy_forest <- function(feature_list, final_rf, module_membership,
 #' @return data.frame with list of selected features and variable
 #'          importance measures.
 #' @note This work was partially funded by NSF IIS 1251151.
-print.fuzzy_forest <- function(fuzzy_forest) {
+print.fuzzy_forest <- function(fuzzy_forest, ...) {
   return(fuzzy_forest$feature_list)
 }
 
@@ -50,5 +51,60 @@ predict.fuzzy_forest <- function(fuzzy_forest, new_data) {
   return(out)
 }
 
+#' Plot method for fuzzy_forest object.
+#' Plots results of fuzzy forest algorithm.
+#' @export
+#' @param fuzzy_forest A fuzzy_forest object.
+#' @note This work was partially funded by NSF IIS 1251151.
 
-
+plot.fuzzy_forest <- function(fuzzy_forest, ...) {
+  ultimate_survivors = as.numeric(gsub("V([0-9]+)"
+                                       , "\\1"
+                                       , row.names(fuzzy_forest$final_rf$importance)
+  )
+  )
+  us_modules = rep(NA, length(ultimate_survivors))
+  for (i in 1:length(ultimate_survivors)){
+    j = ultimate_survivors[i]
+    us_modules[i] = fuzzy_forest$module_membership[[j]]
+  }
+  us_modules = as.data.frame(prop.table(table(us_modules))*100)
+  us_modules = cbind(us_modules, rep("us", nrow(us_modules)))
+  names(us_modules) = c("module", "percent", "type")
+  df = as.data.frame(prop.table(table(fuzzy_forest$module_membership))*100)
+  df = cbind(df, rep("overall", nrow(df)))
+  names(df) = c("module", "percent", "type")
+  df = rbind(df
+             , us_modules
+  )
+  p_module_dist = ggplot(df
+                         , aes(x = module
+                               , y = percent
+                               , fill = type)
+  ) +
+    geom_bar(stat = "identity"
+             , position="dodge"
+             , colour = "#999999"
+    ) +
+    labs(list(title = "Module Membership Distribution"
+              , x = "Module"
+              , y = "Percentage of features in module"
+    )) +
+    theme(axis.line = element_line(colour = "black")
+          , panel.grid.major = element_blank()
+          , panel.grid.minor = element_blank()
+          , panel.border = element_blank()
+          , panel.background = element_blank()
+          , axis.text.y = element_text(size=10)
+          , axis.text.x = element_text(size=10)
+          , axis.title = element_text(size=12, face="bold")
+          , plot.title = element_text(size=14, face="bold")
+    ) +
+    scale_fill_manual(values = c("#CDC9C9", "#95C9FF")
+                      , name = "Category"
+                      , breaks=c("overall", "us")
+                      , labels = c("Overall", "Selected Features")
+    ) +
+    scale_y_continuous(expand=c(0,0))
+    plot(p_module_dist)
+}

@@ -5,14 +5,14 @@
 \title{Set Parameters for Screening Step of
 Fuzzy Forests}
 \usage{
-screen_control(drop_fraction = 0.25, stop_fraction = 0.05,
+screen_control(drop_fraction = 0.25, keep_fraction = 0.05,
   mtry_factor = 1, min_ntree = 10000, ntree_factor = 10)
 }
 \arguments{
 \item{drop_fraction}{A number between 0 and 1.  Percentage of features
 dropped at each iteration.}
 
-\item{stop_fraction}{A number between 0 and 1. Proportion features
+\item{keep_fraction}{A number between 0 and 1. Proportion features
 from each module to retain at screening step.}
 
 \item{mtry_factor}{\code{mtry} is set to

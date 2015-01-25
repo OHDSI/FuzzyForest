@@ -20,7 +20,7 @@
 #' @return An object of type screen_control.
 #' @note This work was partially funded by NSF IIS 1251151.
 screen_control <- function(drop_fraction=.25, keep_fraction=.05,
-                           mtry_factor=1, min_ntree=10000, ntree_factor=10) {
+                           mtry_factor=1, min_ntree=1000, ntree_factor=10) {
   obj <- list()
   obj$drop_fraction <- drop_fraction
   obj$keep_fraction <- keep_fraction
@@ -55,7 +55,7 @@ screen_control <- function(drop_fraction=.25, keep_fraction=.05,
 #' @return An object of type selection_control.
 #' @note This work was partially funded by NSF IIS 1251151.
 select_control <- function(drop_fraction=.25, number_selected=5,
-                              mtry_factor=1, min_ntree=10000, ntree_factor=10) {
+                              mtry_factor=1, min_ntree=5000, ntree_factor=10) {
   obj <- list()
   obj$drop_fraction <- drop_fraction
   obj$number_selected <- number_selected

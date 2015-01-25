@@ -9,5 +9,6 @@
 #' @import WGCNA
 #' @import foreach
 #' @import doParallel
+#' @import ggplot2
 #' @name fuzzyforests
 NULL

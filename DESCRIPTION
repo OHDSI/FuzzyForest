@@ -17,4 +17,5 @@ Imports:
     WGCNA,
     foreach,
     doParallel,
-    parallel
+    parallel,
+    ggplot2

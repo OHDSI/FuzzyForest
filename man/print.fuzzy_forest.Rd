@@ -5,7 +5,7 @@
 \title{Print fuzzy_forest object.
 Prints output from fuzzy forests algorithm.}
 \usage{
-\method{print}{fuzzy_forest}(fuzzy_forest)
+\method{print}{fuzzy_forest}(fuzzy_forest, ...)
 }
 \arguments{
 \item{fuzzy_forest}{A fuzzy_forest object.}

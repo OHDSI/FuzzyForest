@@ -4,7 +4,7 @@
 \alias{iterative_RF}
 \title{Fits iterative random forest algorithm.}
 \usage{
-iterative_RF(X, y, drop_fraction, stop_fraction, mtry_factor,
+iterative_RF(X, y, drop_fraction, keep_fraction, mtry_factor,
   ntree_factor = 10, min_ntree = 5000, num_processors = 1)
 }
 \arguments{
@@ -16,7 +16,7 @@ Each column corresponds to a feature vectors.}
 \item{drop_fraction}{A number between 0 and 1.  Percentage of features
 dropped at each iteration.}
 
-\item{stop_fraction}{A number between 0 and 1. Proportion features
+\item{keep_fraction}{A number between 0 and 1. Proportion features
 from each module to retain at screening step.}
 
 \item{mtry_factor}{A positive number.  Mtry for each random forest
