@@ -5,8 +5,8 @@
 \title{Fits WGCNA based fuzzy forest algorithm.}
 \usage{
 WGCNA_fuzzyforest(X, y, WGCNA_params = WGCNA_control(p = 6),
-  screen_params = screen_control(min_ntree = 100),
-  select_params = select_control(min_ntree = 100), num_processors = 1)
+  screen_params = screen_control(min_ntree = 5000),
+  select_params = select_control(min_ntree = 5000), num_processors = 1)
 }
 \arguments{
 \item{X}{A data.frame.

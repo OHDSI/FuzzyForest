@@ -6,7 +6,7 @@
 Fuzzy Forests}
 \usage{
 select_control(drop_fraction = 0.25, number_selected = 5, mtry_factor = 1,
-  min_ntree = 10000, ntree_factor = 10)
+  min_ntree = 5000, ntree_factor = 10)
 }
 \arguments{
 \item{drop_fraction}{A number between 0 and 1.  Percentage of features

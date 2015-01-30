@@ -5,7 +5,7 @@
 \title{Fits fuzzy forest algorithm.}
 \usage{
 fuzzyforest(X, y, module_membership, screen_params = screen_control(min_ntree
-  = 100), select_params = select_control(min_ntree = 100),
+  = 5000), select_params = select_control(min_ntree = 5000),
   num_processors = 1)
 }
 \arguments{

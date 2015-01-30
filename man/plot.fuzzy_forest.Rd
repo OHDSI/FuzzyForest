@@ -9,6 +9,8 @@ Plots results of fuzzy forest algorithm.}
 }
 \arguments{
 \item{fuzzy_forest}{A fuzzy_forest object.}
+
+\item{...}{aditional arguments}
 }
 \description{
 Plot method for fuzzy_forest object.

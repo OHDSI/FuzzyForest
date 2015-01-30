@@ -28,6 +28,7 @@ fuzzy_forest <- function(feature_list, final_rf, module_membership,
 #' Prints output from fuzzy forests algorithm.
 #' @export
 #' @param fuzzy_forest A fuzzy_forest object.
+#' @param ... additional arguments
 #' @return data.frame with list of selected features and variable
 #'          importance measures.
 #' @note This work was partially funded by NSF IIS 1251151.
@@ -55,6 +56,7 @@ predict.fuzzy_forest <- function(fuzzy_forest, new_data) {
 #' Plots results of fuzzy forest algorithm.
 #' @export
 #' @param fuzzy_forest A fuzzy_forest object.
+#' @param ... aditional arguments
 #' @note This work was partially funded by NSF IIS 1251151.
 
 plot.fuzzy_forest <- function(fuzzy_forest, ...) {
@@ -77,6 +79,9 @@ plot.fuzzy_forest <- function(fuzzy_forest, ...) {
   df = rbind(df
              , us_modules
   )
+  module=5
+  percent=5
+  type=5
   p_module_dist = ggplot(df
                          , aes(x = module
                                , y = percent
