@@ -5,15 +5,17 @@
 \title{Predict method for fuzzy_forest object.
 Obtains predictions from fuzzy forest algorithm.}
 \usage{
-\method{predict}{fuzzy_forest}(fuzzy_forest, new_data)
+\method{predict}{fuzzy_forest}(object, new_data, ...)
 }
 \arguments{
-\item{fuzzy_forest}{A fuzzy_forest object.}
+\item{object}{A fuzzy_forest object.}
 
 \item{new_data}{A matrix or data.frame containing new_data.
-                Pay close attention to ensure feature names
-                match between training set and test set
-                data.frame.}
+Pay close attention to ensure feature names
+match between training set and test set
+data.frame.}
+
+\item{...}{Additional arguments not currently used.}
 }
 \value{
 A vector of predictions

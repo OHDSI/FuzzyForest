@@ -5,10 +5,10 @@
 \title{Plot method for fuzzy_forest object.
 Plots results of fuzzy forest algorithm.}
 \usage{
-\method{plot}{fuzzy_forest}(fuzzy_forest, ...)
+\method{plot}{fuzzy_forest}(x, ...)
 }
 \arguments{
-\item{fuzzy_forest}{A fuzzy_forest object.}
+\item{x}{A fuzzy_forest object.}
 
 \item{...}{aditional arguments}
 }
