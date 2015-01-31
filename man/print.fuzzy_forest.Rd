@@ -10,7 +10,7 @@ Prints output from fuzzy forests algorithm.}
 \arguments{
 \item{x}{A fuzzy_forest object.}
 
-\item{...}{additional arguments}
+\item{...}{Additional arguments}
 }
 \value{
 data.frame with list of selected features and variable
