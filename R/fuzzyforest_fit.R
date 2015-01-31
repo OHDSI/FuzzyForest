@@ -69,12 +69,12 @@ fuzzyforest <- function(X, y, module_membership,
                      #second argument to '%dopar%'
                      randomForest(module , y, ntree = ntree, mtry = mtry,
                      importance = TRUE, scale = FALSE))
-      var_importance <- rf$importance
+      var_importance <- importance(rf, type=1, scale=FALSE)
       var_importance <- var_importance[order(var_importance[, 1],
-                                             decreasing=TRUE), ]
+                                             decreasing=TRUE), ,drop=FALSE]
       reduction <- ceiling(num_features*drop_fraction)
       if(num_features - reduction > target) {
-          trimmed_varlist <- var_importance[1:(num_features - reduction), ]
+          trimmed_varlist <- var_importance[1:(num_features - reduction), ,drop=FALSE]
           features <- row.names(trimmed_varlist)
           module <- module[, which(names(module) %in% features)]
           num_features <- length(features)

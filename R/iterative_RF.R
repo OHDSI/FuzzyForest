@@ -39,12 +39,12 @@ iterative_RF <- function(X, y, drop_fraction, keep_fraction, mtry_factor,
                    #second argument to '%dopar%'
                    randomForest(current_X , y, ntree = ntree, mtry = mtry,
                                 importance = TRUE, scale = FALSE))
-    var_importance <- rf$importance
+    var_importance <- importance(rf, type=1)
     var_importance <- var_importance[order(var_importance[, 1],
-                                           decreasing=TRUE), ]
+                                           decreasing=TRUE), ,drop=FALSE]
     reduction <- ceiling(num_features*drop_fraction)
     if(num_features - reduction > target) {
-      trimmed_varlist <- var_importance[1:(num_features - reduction), ]
+      trimmed_varlist <- var_importance[1:(num_features - reduction), ,drop=FALSE]
       features <- row.names(trimmed_varlist)
       module <- current_X[, which(names(current_X) %in% features)]
       num_features <- length(features)
