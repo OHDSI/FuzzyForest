@@ -12,7 +12,9 @@ fuzzyforest(X, y, module_membership, screen_params = screen_control(min_ntree
 \item{X}{A data.frame.
 Each column corresponds to a feature vectors.}
 
-\item{y}{Response vector.}
+\item{y}{Response vector.  For classification y should be
+a factor.  If y takes on only two values, y will
+be coerced into a factor.}
 
 \item{module_membership}{A vector giving module membership of each feature.}
 

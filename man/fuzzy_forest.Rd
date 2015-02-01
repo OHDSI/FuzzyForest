@@ -7,15 +7,15 @@
 fuzzy_forest(feature_list, final_rf, module_membership, WGCNA_object = NULL)
 }
 \arguments{
-\item{feature_list}{List of selected features with variable
-importance.}
+\item{feature_list}{List of selected features along with variable
+importance measures.}
 
-\item{final_rf}{The final random forest that was fit by
-fuzzy forests.}
+\item{final_rf}{A final random forest fit using the features
+selected by fuzzy forests.}
 
 \item{module_membership}{Module membership of each feature.}
 
-\item{WGCNA_object}{output of WGCNA analysis.}
+\item{WGCNA_object}{If applicable, output of WGCNA analysis.}
 }
 \value{
 An object of type fuzzy_forest.

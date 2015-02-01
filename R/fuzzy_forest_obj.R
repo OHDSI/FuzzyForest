@@ -3,12 +3,12 @@
 #' Fuzzy forests returns an object of type
 #' fuzzyforest.
 #' @export
-#' @param feature_list      List of selected features with variable
-#'                          importance.
-#' @param final_rf          The final random forest that was fit by
-#'                          fuzzy forests.
+#' @param feature_list      List of selected features along with variable
+#'                          importance measures.
+#' @param final_rf          A final random forest fit using the features
+#'                          selected by fuzzy forests.
 #' @param module_membership Module membership of each feature.
-#' @param WGCNA_object output of WGCNA analysis.
+#' @param WGCNA_object      If applicable, output of WGCNA analysis.
 #' @return An object of type fuzzy_forest.
 #' @note This work was partially funded by NSF IIS 1251151.
 fuzzy_forest <- function(feature_list, final_rf, module_membership,
