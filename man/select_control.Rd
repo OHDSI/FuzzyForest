@@ -15,9 +15,12 @@ dropped at each iteration.}
 \item{number_selected}{A positive number. Number of features
 that will be selected by fuzzyforests.}
 
-\item{mtry_factor}{A number between 0 and 1.  Mtry for each random forest
-is set to \code{p_current*mtry_fraction} where
-\code{p_current} is the current number of features.}
+\item{mtry_factor}{In the case of regression, \code{mtry} is set to
+\code{ceiling}(\eqn{\sqrt(p)}*\code{mtry_factor}).
+In the case of classification, \code{mtry} is set to
+\code{ceiling}((p/3)*\code{mtry_factor}).  If either
+of these numbers is greater than p, \code{mtry} is
+set to p.}
 
 \item{min_ntree}{Minimum number of trees grown in each random forest.}
 

@@ -74,22 +74,24 @@ iterative_RF <- function(X, y, drop_fraction, keep_fraction, mtry_factor,
 #' @param drop_fraction     A number between 0 and 1.  Percentage of features
 #'                          dropped at each iteration.
 #' @param number_selected   Number of features selected by fuzzyforest.
-#' @param mtry_factor       A positive number.  Mtry for each random forest
-#'                          is set to
-#'                          \code{ceiling}(\eqn{\sqrt{p}}\code{mtry_factor})
-#'                          where \code{p} is the current number of features.
+#' @param mtry_factor       In the case of regression, \code{mtry} is set to
+#'                          \code{ceiling}(\eqn{\sqrt(p)}*\code{mtry_factor}).
+#'                          In the case of classification, \code{mtry} is set to
+#'                          \code{ceiling}((p/3)*\code{mtry_factor}).  If either
+#'                          of these numbers is greater than p, \code{mtry} is
+#'                          set to p.
+#' @param min_ntree         Minimum number of trees grown in each random forest.
 #' @param ntree_factor      A number greater than 1.  \code{ntree} for each
 #'                          random is \code{ntree_factor} times the number
 #'                          of features.  For each random forest, \code{ntree}
 #'                          is set to \code{max}(\code{min_ntree},
 #'                          \code{ntree_factor}*\code{p}).
-#' @param min_ntree         Minimum number of trees grown in each random forest.
 #' @param num_processors    Number of processors used to fit random forests.
 #' @return A data.frame with the top ranked features.
 #' @note This work was partially funded by NSF IIS 1251151.
-select_RF <- function(X, y, drop_fraction, number_selected=5, mtry_factor,
-                      ntree_factor = 10, min_ntree=5000,
-                      num_processors = 1) {
+select_RF <- function(X, y, drop_fraction, number_selected, mtry_factor,
+                      ntree_factor, min_ntree,
+                      num_processors) {
   cl = parallel::makeCluster(num_processors)
   doParallel::registerDoParallel(cl)
   num_features <- ncol(X)

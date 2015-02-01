@@ -10,8 +10,9 @@ WGCNA_control(power = 6, ...)
 \arguments{
 \item{power}{Power of adjacency function.}
 
-\item{...}{Other arguments.  See documentation for
-WGCNA.}
+\item{...}{Additional arguments.
+See \code{\link[WGCNA]{blockwiseModules}} for
+details.}
 }
 \value{
 An object of type WGCNA_control.

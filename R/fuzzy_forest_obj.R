@@ -28,7 +28,7 @@ fuzzy_forest <- function(feature_list, final_rf, module_membership,
 #' Prints output from fuzzy forests algorithm.
 #' @export
 #' @param x   A fuzzy_forest object.
-#' @param ... Additional arguments
+#' @param ... Additional arguments not in use.
 #' @return data.frame with list of selected features and variable
 #'          importance measures.
 #' @note This work was partially funded by NSF IIS 1251151.
@@ -45,7 +45,7 @@ print.fuzzy_forest <- function(x, ...) {
 #'                 Pay close attention to ensure feature names
 #'                 match between training set and test set
 #'                 data.frame.
-#' @param ...      Additional arguments not used.
+#' @param ...      Additional arguments not in use.
 #' @return A vector of predictions
 #' @note This work was partially funded by NSF IIS 1251151.
 predict.fuzzy_forest <- function(object, new_data, ...) {
@@ -57,7 +57,7 @@ predict.fuzzy_forest <- function(object, new_data, ...) {
 #' Plots results of fuzzy forest algorithm.
 #' @export
 #' @param x   A fuzzy_forest object.
-#' @param ... aditional arguments
+#' @param ... Additional arguments not in use.
 #' @note This work was partially funded by NSF IIS 1251151.
 
 plot.fuzzy_forest <- function(x, ...) {

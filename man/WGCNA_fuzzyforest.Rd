@@ -14,11 +14,21 @@ Each column corresponds to a feature vectors.}
 
 \item{y}{Response vector.}
 
-\item{WGCNA_params}{An object of class WGCNA_control.}
+\item{WGCNA_params}{Parameters for WGCNA.
+See \code{\link[WGCNA]{blockwiseModules}} and
+\code{\link[fuzzyforest]{WGCNA_control}} for details.
+\code{WGCNA_params} is an object of type
+\code{WGCNA_control}.}
 
-\item{screen_params}{An object of class screen_control.}
+\item{screen_params}{Parameters for screening step of fuzzy forests.
+See \code{\link[fuzzyforest]{screen_control}} for details.
+\code{screen_params} is an object of type
+\code{screen_control}.}
 
-\item{select_params}{An object of class selection_control.}
+\item{select_params}{Parameters for selection step of fuzzy forests.
+See \code{\link[fuzzyforest]{select_control}} for details.
+\code{select_params} is an object of type
+\code{select_control}.}
 
 \item{num_processors}{Number of processors.}
 }

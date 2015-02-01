@@ -15,7 +15,7 @@ Pay close attention to ensure feature names
 match between training set and test set
 data.frame.}
 
-\item{...}{Additional arguments not used.}
+\item{...}{Additional arguments not in use.}
 }
 \value{
 A vector of predictions

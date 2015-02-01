@@ -6,17 +6,21 @@
 Fuzzy Forests}
 \usage{
 screen_control(drop_fraction = 0.25, keep_fraction = 0.05,
-  mtry_factor = 1, min_ntree = 1000, ntree_factor = 10)
+  mtry_factor = 1, min_ntree = 5000, ntree_factor = 10)
 }
 \arguments{
 \item{drop_fraction}{A number between 0 and 1.  Percentage of features
 dropped at each iteration.}
 
-\item{keep_fraction}{A number between 0 and 1. Proportion features
-from each module to retain at screening step.}
+\item{keep_fraction}{A number between 0 and 1. Proportion of features
+from each module that are retained from screening step.}
 
-\item{mtry_factor}{\code{mtry} is set to
-\eqn{\sqrt(p)}*\code{mtry_factor}.}
+\item{mtry_factor}{In the case of regression, \code{mtry} is set to
+                         \code{ceiling}(\eqn{\sqrt(p)}*\code{mtry_factor}).
+                         In the case of classification, \code{mtry} is set to
+                         \code{ceiling}((p/3)*\code{mtry_factor}).  If either
+                         of these numbers is greater than p, \code{mtry} is
+                         set to p.}
 
 \item{min_ntree}{Minimum number of trees grown in each random forest.}
 
@@ -24,7 +28,7 @@ from each module to retain at screening step.}
 random is \code{ntree_factor} times the number
 of features.  For each random forest, \code{ntree}
 is set to \code{max}(\code{min_ntree},
-\code{ntree_factor}*\code{p}).}
+\code{ntree_factor}*p).}
 }
 \value{
 An object of type screen_control.

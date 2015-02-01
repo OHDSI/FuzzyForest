@@ -10,7 +10,7 @@ Plots results of fuzzy forest algorithm.}
 \arguments{
 \item{x}{A fuzzy_forest object.}
 
-\item{...}{aditional arguments}
+\item{...}{Additional arguments not in use.}
 }
 \description{
 Plot method for fuzzy_forest object.
