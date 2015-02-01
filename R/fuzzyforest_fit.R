@@ -5,7 +5,9 @@
 #' @export
 #' @param X                 A data.frame.
 #'                          Each column corresponds to a feature vectors.
-#' @param y                 Response vector.
+#' @param y                 Response vector.  For classification y should be
+#'                          a factor.  If y takes on only two values, y will
+#'                          be coerced into a factor.
 #' @param module_membership A vector giving module membership of each feature.
 #' @param screen_params     Parameters for screening step of fuzzy forests.
 #'                          See \code{\link[fuzzyforest]{screen_control}} for details.
@@ -43,6 +45,7 @@ fuzzyforest <- function(X, y, module_membership,
                         screen_params = screen_control(min_ntree=5000),
                         select_params = select_control(min_ntree=5000),
                         num_processors=1) {
+  CLASSIFICATION <- is.factor(y)
   screen_control <- screen_params
   select_control <-  select_params
   module_list <- unique(module_membership)
@@ -58,7 +61,12 @@ fuzzyforest <- function(X, y, module_membership,
     module <- X[, which(module_membership == module_list[i])]
     num_features <- ncol(module)
     #TUNING PARAMETER mtry_factor
-    mtry <- ceiling(mtry_factor*sqrt(num_features))
+    if(CLASSIFICATION == TRUE) {
+      mtry <- ceiling(mtry_factor*num_features/3)
+    }
+    if(CLASSIFICATION == FALSE) {
+      mtry <- ceiling(mtry_factor*sqrt(num_features))
+    }
     #TUNING PARAMETER ntree_factor
     ntree <- max(num_features*ntree_factor, min_ntree)
     #TUNING PARAMETER keep_fraction
@@ -78,7 +86,12 @@ fuzzyforest <- function(X, y, module_membership,
           features <- row.names(trimmed_varlist)
           module <- module[, which(names(module) %in% features)]
           num_features <- length(features)
-          mtry <- mtry_factor*sqrt(num_features)
+          if(CLASSIFICATION == TRUE) {
+            mtry <- ceiling(mtry_factor*num_features/3)
+          }
+          if(CLASSIFICATION == FALSE) {
+            mtry <- ceiling(mtry_factor*sqrt(num_features))
+          }
           ntree <- max(num_features*ntree_factor, min_ntree)
         }
       else {
@@ -105,9 +118,13 @@ fuzzyforest <- function(X, y, module_membership,
   final_list <- as.data.frame(final_list, stringsAsFactors=FALSE)
   final_list[, 2] <- as.numeric(final_list[, 2])
   final_X <- X[, names(X) %in% final_list[, 1],drop=FALSE]
-  final_mtry <- floor(select_control$mtry_factor*sqrt(ncol(final_list)))
-  #browser()
-  final_rf <- randomForest(x=final_X, y=y, mtry=final_mtry)
+  if(CLASSIFICATION == TRUE) {
+    final_mtry <- ceiling(select_control$mtry_factor*ncol(final_list)/3)
+  }
+  if(CLASSIFICATION == FALSE) {
+    final_mtry <- ceiling(select_control$mtry_factor*sqrt(ncol(final_list)))
+  }
+  final_rf <- randomForest(x=final_X, y=y, mtry=final_mtry, importance=TRUE)
   out <- fuzzy_forest(final_list, final_rf, module_membership)
   return(out)
 }
