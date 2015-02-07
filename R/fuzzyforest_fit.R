@@ -57,6 +57,13 @@ fuzzyforest <- function(X, y, module_membership,
   ntree_factor <- screen_control$ntree_factor
   min_ntree <- screen_control$min_ntree
   keep_fraction <- screen_control$keep_fraction
+
+  if(ncol(X)*keep_fraction < select_control$number_selected){
+    warning(c("ncol(X)*keep_fraction < number_selected", "\n",
+              "number_selected will be set to floor(ncol(X)*keep_fraction)"))
+              select_control$number_selected <- floor(ncol(X)*keep_fraction)
+  }
+
   for (i in 1:length(module_list)) {
     module <- X[, which(module_membership == module_list[i])]
     num_features <- ncol(module)
