@@ -106,9 +106,15 @@ fuzzyforest <- function(X, y, module_membership,
           mod_varlist <- var_importance[, 1][1:target]
           features <- row.names(var_importance)[1:target]
           survivors[[i]] <- cbind(features, mod_varlist)
+          row.names(survivors[[i]]) <- NULL
+          survivors[[i]] <- as.data.frame(survivors[[i]])
+          survivors[[i]][, 1] <- as.character(survivors[[i]][, 1])
+          survivors[[i]][, 2] <- as.numeric(as.character(survivors[[i]][, 2]))
         }
     }
   }
+  survivor_list <- survivors
+  names(survivor_list) <- module_list
   parallel::stopCluster(cl)
   survivors <- do.call('rbind', survivors)
   survivors <- as.data.frame(survivors, stringsAsFactors = FALSE)
@@ -132,7 +138,8 @@ fuzzyforest <- function(X, y, module_membership,
     final_mtry <- ceiling(select_control$mtry_factor*sqrt(ncol(final_list)))
   }
   final_rf <- randomForest(x=final_X, y=y, mtry=final_mtry, importance=TRUE)
-  out <- fuzzy_forest(final_list, final_rf, module_membership)
+  out <- fuzzy_forest(final_list, final_rf, module_membership,
+                      survivor_list=survivor_list)
   return(out)
 }
 

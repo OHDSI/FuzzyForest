@@ -9,16 +9,19 @@
 #'                          selected by fuzzy forests.
 #' @param module_membership Module membership of each feature.
 #' @param WGCNA_object      If applicable, output of WGCNA analysis.
+#' @param survivor_list     List of features that have survived screening step.
 #' @return An object of type fuzzy_forest.
 #' @note This work was partially funded by NSF IIS 1251151.
 fuzzy_forest <- function(feature_list, final_rf, module_membership,
-                         WGCNA_object=NULL) {
+                         WGCNA_object=NULL, survivor_list) {
   out <- list()
   out[[1]] <- feature_list
   out[[2]] <- final_rf
   out[[3]] <- module_membership
   out[[4]] <- module_membership
-  names(out) <- c("feature_list", "final_rf", "module_membership", "WGCNA_object")
+  out[[5]] <- survivor_list
+  names(out) <- c("feature_list", "final_rf", "module_membership",
+                  "WGCNA_object", "survivor_list")
   class(out) <- "fuzzy_forest"
   return(out)
 }
