@@ -124,7 +124,9 @@ fuzzyforest <- function(X, y, module_membership,
   select_args <- list(X_surv, y, num_processors)
   select_args <- c(select_args, select_control)
   names(select_args)[1:3] <- c("X", "y", "num_processors")
-  final_list <- do.call("select_RF", select_args)
+  select_results <- do.call("select_RF", select_args)
+  final_list <- select_results[[1]]
+  selection_list <- select_results[[2]]
   final_list[, 2] <- round(as.numeric(final_list[, 2]), 4)
   row.names(final_list) <- NULL
   colnames(final_list) <- c("feature_name", "variable_importance")
@@ -139,7 +141,7 @@ fuzzyforest <- function(X, y, module_membership,
   }
   final_rf <- randomForest(x=final_X, y=y, mtry=final_mtry, importance=TRUE)
   out <- fuzzy_forest(final_list, final_rf, module_membership,
-                      survivor_list=survivor_list)
+                      survivor_list=survivor_list, selection_list=selection_list)
   return(out)
 }
 

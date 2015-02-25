@@ -46,7 +46,7 @@ iterative_RF <- function(X, y, drop_fraction, keep_fraction, mtry_factor,
     if(num_features - reduction > target) {
       trimmed_varlist <- var_importance[1:(num_features - reduction), ,drop=FALSE]
       features <- row.names(trimmed_varlist)
-      module <- current_X[, which(names(current_X) %in% features)]
+      current_X <- current_X[, which(names(current_X) %in% features)]
       num_features <- length(features)
       mtry <- ceiling(mtry_factor*sqrt(num_features))
       ntree <- max(num_features*ntree_factor, min_ntree)
@@ -92,6 +92,7 @@ iterative_RF <- function(X, y, drop_fraction, keep_fraction, mtry_factor,
 select_RF <- function(X, y, drop_fraction, number_selected, mtry_factor,
                       ntree_factor, min_ntree,
                       num_processors) {
+  selection_list <- list()
   cl = parallel::makeCluster(num_processors)
   doParallel::registerDoParallel(cl)
   num_features <- ncol(X)
@@ -99,6 +100,7 @@ select_RF <- function(X, y, drop_fraction, number_selected, mtry_factor,
   ntree <- max(num_features*ntree_factor, min_ntree)
   target <- number_selected
   current_X <- X
+  i <- 1
   while (num_features >= target){
     rf = `%dopar%`(foreach(ntree = rep(ntree/num_processors, num_processors)
                            , .combine = combine, .packages = 'randomForest'),
@@ -108,11 +110,16 @@ select_RF <- function(X, y, drop_fraction, number_selected, mtry_factor,
     var_importance <- rf$importance
     var_importance <- var_importance[order(var_importance[, 1],
                                            decreasing=TRUE), ]
+    selection_list[[i]] <- data.frame(row.names(var_importance),
+                                      round(var_importance[, 1], 4),
+                                      stringsAsFactors=FALSE)
+    names(selection_list[[i]]) <- c("feature_name", "variable_importance")
+    i <- i + 1
     reduction <- ceiling(num_features*drop_fraction)
     if(num_features - reduction > target) {
       trimmed_varlist <- var_importance[1:(num_features - reduction), ]
       features <- row.names(trimmed_varlist)
-      module <- current_X[, which(names(current_X) %in% features)]
+      current_X <- current_X[, which(names(current_X) %in% features)]
       num_features <- length(features)
       mtry <- ceiling(mtry_factor*sqrt(num_features))
       ntree <- max(num_features*ntree_factor, min_ntree)
@@ -121,10 +128,14 @@ select_RF <- function(X, y, drop_fraction, number_selected, mtry_factor,
       num_features <- target - 1
       mod_varlist <- var_importance[, 1][1:target]
       features <- row.names(var_importance)[1:target]
-      out <- cbind(features, mod_varlist)
+      feature_list <- cbind(features, mod_varlist)
+      selection_list[[i]] <- as.data.frame(cbind(features, round(mod_varlist, 4)),
+                                           stringsAsFactors=FALSE)
+      names(selection_list[[i]]) <- c("feature_name", "variable_importance")
     }
   }
   parallel::stopCluster(cl)
+  out <- list(feature_list, selection_list)
   return(out)
 }
 
