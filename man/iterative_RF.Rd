@@ -5,7 +5,7 @@
 \title{Fits iterative random forest algorithm.}
 \usage{
 iterative_RF(X, y, drop_fraction, keep_fraction, mtry_factor,
-  ntree_factor = 10, min_ntree = 5000, num_processors = 1)
+  ntree_factor = 10, min_ntree = 5000, num_processors = 1, nodesize)
 }
 \arguments{
 \item{X}{A data.frame.
@@ -33,6 +33,8 @@ is set to \code{max}(\code{min_ntree},
 \item{min_ntree}{Minimum number of trees grown in each random forest.}
 
 \item{num_processors}{Number of processors used to fit random forests.}
+
+\item{nodesize}{Minimum nodesize.}
 }
 \value{
 A data.frame with the top ranked features.

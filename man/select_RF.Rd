@@ -5,7 +5,7 @@
 \title{Carries out selection step of fuzzyforest algorithm.}
 \usage{
 select_RF(X, y, drop_fraction, number_selected, mtry_factor, ntree_factor,
-  min_ntree, num_processors)
+  min_ntree, num_processors, nodesize)
 }
 \arguments{
 \item{X}{A data.frame.
@@ -34,6 +34,8 @@ is set to \code{max}(\code{min_ntree},
 \item{min_ntree}{Minimum number of trees grown in each random forest.}
 
 \item{num_processors}{Number of processors used to fit random forests.}
+
+\item{nodesize}{Minimum nodesize}
 }
 \value{
 A data.frame with the top ranked features.

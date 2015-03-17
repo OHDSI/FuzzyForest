@@ -6,7 +6,7 @@
 \usage{
 fuzzyforest(X, y, module_membership, screen_params = screen_control(min_ntree
   = 5000), select_params = select_control(min_ntree = 5000),
-  num_processors = 1)
+  num_processors = 1, nodesize)
 }
 \arguments{
 \item{X}{A data.frame.
@@ -29,6 +29,9 @@ See \code{\link[fuzzyforest]{select_control}} for details.
 \code{select_control}.}
 
 \item{num_processors}{Number of processors used to fit random forests.}
+
+\item{nodesize}{Minimum terminal nodesize. 1 if classification.
+5 if regression.}
 }
 \value{
 A data.frame with the top ranked features.

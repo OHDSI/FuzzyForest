@@ -18,6 +18,8 @@
 #'                          \code{select_params} is an object of type
 #'                          \code{select_control}.
 #' @param num_processors    Number of processors used to fit random forests.
+#' @param nodesize          Minimum terminal nodesize. 1 if classification.
+#'                          5 if regression.
 #' @examples
 #' n <- 500
 #' minCor = .66
@@ -44,7 +46,7 @@
 fuzzyforest <- function(X, y, module_membership,
                         screen_params = screen_control(min_ntree=5000),
                         select_params = select_control(min_ntree=5000),
-                        num_processors=1) {
+                        num_processors=1, nodesize) {
   CLASSIFICATION <- is.factor(y)
   screen_control <- screen_params
   select_control <-  select_params
@@ -70,9 +72,15 @@ fuzzyforest <- function(X, y, module_membership,
     #TUNING PARAMETER mtry_factor
     if(CLASSIFICATION == TRUE) {
       mtry <- ceiling(mtry_factor*num_features/3)
+      if(missing(nodesize)){
+        nodesize <- 1
+      }
     }
     if(CLASSIFICATION == FALSE) {
       mtry <- ceiling(mtry_factor*sqrt(num_features))
+      if(missing(nodesize)){
+        nodesize <- 5
+      }
     }
     #TUNING PARAMETER ntree_factor
     ntree <- max(num_features*ntree_factor, min_ntree)
@@ -83,7 +91,7 @@ fuzzyforest <- function(X, y, module_membership,
                      , .combine = combine, .packages = 'randomForest'),
                      #second argument to '%dopar%'
                      randomForest(module , y, ntree = ntree, mtry = mtry,
-                     importance = TRUE, scale = FALSE))
+                     importance = TRUE, scale = FALSE, nodesize=nodesize))
       var_importance <- importance(rf, type=1, scale=FALSE)
       var_importance <- var_importance[order(var_importance[, 1],
                                              decreasing=TRUE), ,drop=FALSE]
@@ -121,9 +129,9 @@ fuzzyforest <- function(X, y, module_membership,
   survivors[, 2] <- as.numeric(survivors[, 2])
   names(survivors) <- c("featureID", "Permutation VIM")
   X_surv <- X[, names(X) %in% survivors[,1]]
-  select_args <- list(X_surv, y, num_processors)
+  select_args <- list(X_surv, y, num_processors, nodesize)
   select_args <- c(select_args, select_control)
-  names(select_args)[1:3] <- c("X", "y", "num_processors")
+  names(select_args)[1:4] <- c("X", "y", "num_processors", "nodesize")
   select_results <- do.call("select_RF", select_args)
   final_list <- select_results[[1]]
   selection_list <- select_results[[2]]
@@ -139,7 +147,8 @@ fuzzyforest <- function(X, y, module_membership,
   if(CLASSIFICATION == FALSE) {
     final_mtry <- ceiling(select_control$mtry_factor*sqrt(ncol(final_list)))
   }
-  final_rf <- randomForest(x=final_X, y=y, mtry=final_mtry, importance=TRUE)
+  final_rf <- randomForest(x=final_X, y=y, mtry=final_mtry, importance=TRUE,
+                           nodesize=nodesize)
   out <- fuzzy_forest(final_list, final_rf, module_membership,
                       survivor_list=survivor_list, selection_list=selection_list)
   return(out)
@@ -168,14 +177,26 @@ fuzzyforest <- function(X, y, module_membership,
 #'                          \code{select_params} is an object of type
 #'                          \code{select_control}.
 #' @param num_processors    Number of processors.
+#' @param nodesize          Minimum terminal nodesize. 1 if classification.
+#'                          5 if regression.
 #' @return A data.frame with the top ranked features.
 #' @note This work was partially funded by NSF IIS 1251151.
 WGCNA_fuzzyforest <- function(X, y, WGCNA_params=WGCNA_control(p=6),
                         screen_params=screen_control(min_ntree=5000),
                         select_params=select_control(min_ntree=5000),
-                        num_processors=1) {
-
+                        num_processors=1, nodesize) {
   #browser()
+  CLASSIFICATION <- is.factor(y)
+  if(CLASSIFICATION == TRUE) {
+    if(missing(nodesize)){
+      nodesize <- 1
+    }
+  }
+  if(CLASSIFICATION == FALSE) {
+    if(missing(nodesize)){
+      nodesize <- 5
+    }
+  }
   WGCNA_control <- WGCNA_params
   screen_control <- screen_params
   select_control <-  select_params
@@ -191,7 +212,7 @@ WGCNA_fuzzyforest <- function(X, y, WGCNA_params=WGCNA_control(p=6),
   screen_min_ntree <- screen_control$min_ntree
   out <- fuzzyforest(X, y, module_membership,
                     screen_control, select_control,
-                    num_processors)
+                    num_processors, nodesize=nodesize)
   out$WGCNA_object <- bwise
   return(out)
 }

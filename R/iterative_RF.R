@@ -21,11 +21,12 @@
 #'                          \code{ntree_factor}*\code{p}).
 #' @param min_ntree         Minimum number of trees grown in each random forest.
 #' @param num_processors    Number of processors used to fit random forests.
+#' @param nodesize          Minimum nodesize.
 #' @return A data.frame with the top ranked features.
 #' @note This work was partially funded by NSF IIS 1251151.
 iterative_RF <- function(X, y, drop_fraction, keep_fraction, mtry_factor,
                          ntree_factor = 10, min_ntree=5000,
-                         num_processors = 1) {
+                         num_processors = 1, nodesize) {
   cl = parallel::makeCluster(num_processors)
   doParallel::registerDoParallel(cl)
   num_features <- ncol(X)
@@ -38,7 +39,8 @@ iterative_RF <- function(X, y, drop_fraction, keep_fraction, mtry_factor,
                            , .combine = combine, .packages = 'randomForest'),
                    #second argument to '%dopar%'
                    randomForest(current_X , y, ntree = ntree, mtry = mtry,
-                                importance = TRUE, scale = FALSE))
+                                importance = TRUE, scale = FALSE,
+                                nodesize=nodesize))
     var_importance <- importance(rf, type=1)
     var_importance <- var_importance[order(var_importance[, 1],
                                            decreasing=TRUE), ,drop=FALSE]
@@ -87,11 +89,12 @@ iterative_RF <- function(X, y, drop_fraction, keep_fraction, mtry_factor,
 #'                          is set to \code{max}(\code{min_ntree},
 #'                          \code{ntree_factor}*\code{p}).
 #' @param num_processors    Number of processors used to fit random forests.
+#' @param nodesize          Minimum nodesize
 #' @return A data.frame with the top ranked features.
 #' @note This work was partially funded by NSF IIS 1251151.
 select_RF <- function(X, y, drop_fraction, number_selected, mtry_factor,
                       ntree_factor, min_ntree,
-                      num_processors) {
+                      num_processors, nodesize) {
   selection_list <- list()
   cl = parallel::makeCluster(num_processors)
   doParallel::registerDoParallel(cl)
@@ -106,7 +109,8 @@ select_RF <- function(X, y, drop_fraction, number_selected, mtry_factor,
                            , .combine = combine, .packages = 'randomForest'),
                    #second argument to '%dopar%'
                    randomForest(current_X , y, ntree = ntree, mtry = mtry,
-                                importance = TRUE, scale = FALSE))
+                                importance = TRUE, scale = FALSE,
+                                nodesize=nodesize))
     var_importance <- rf$importance
     var_importance <- var_importance[order(var_importance[, 1],
                                            decreasing=TRUE), ]
