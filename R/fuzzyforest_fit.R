@@ -51,13 +51,9 @@ ff <- function(X, y, module_membership,
   screen_control <- screen_params
   select_control <-  select_params
   module_list <- unique(module_membership)
-#   tryCatch({
-#     parallel::stopCluster(cl)},
-#     warning = function(w) {},
-#     error = function(e) {},
-#     finally = {})
   cl = parallel::makeCluster(num_processors)
   doParallel::registerDoParallel(cl)
+  on.exit(parallel::stopCluster(cl))
   survivors <- vector('list', length(module_list))
   drop_fraction <- screen_control$drop_fraction
   mtry_factor <- screen_control$mtry_factor
@@ -127,8 +123,6 @@ ff <- function(X, y, module_membership,
   }
   survivor_list <- survivors
   names(survivor_list) <- module_list
-#   suppressWarnings(stopImplicitCluster())
-#   suppressWarnings(parallel::stopCluster(cl))
   survivors <- do.call('rbind', survivors)
   survivors <- as.data.frame(survivors, stringsAsFactors = FALSE)
   survivors[, 2] <- as.numeric(survivors[, 2])
