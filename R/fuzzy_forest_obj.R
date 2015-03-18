@@ -39,8 +39,7 @@ fuzzy_forest <- function(feature_list, final_rf, module_membership,
 #'          importance measures.
 #' @note This work was partially funded by NSF IIS 1251151.
 print.fuzzy_forest <- function(x, ...) {
-  fuzzy_forest <- x
-  return(fuzzy_forest$feature_list)
+  print(x$feature_list)
 }
 
 #' Predict method for fuzzy_forest object.
