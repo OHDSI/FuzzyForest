@@ -38,12 +38,12 @@
 #' X <- as.data.frame(X)
 #' names(X) <- paste("V",1:p,sep="")
 #' module_membership <- as.character(rep(1:2,each=p/2))
-#' ff <- fuzzyforest(X, y, module_membership,
+#' fit <- ff(X, y, module_membership,
 #'                   screen_params=screen_control(min_ntree=100),
 #'                   select_params=select_control(number_selected=3, min_ntree=100))
 #' @return A data.frame with the top ranked features.
 #' @note This work was partially funded by NSF IIS 1251151.
-fuzzyforest <- function(X, y, module_membership,
+ff <- function(X, y, module_membership,
                         screen_params = screen_control(min_ntree=5000),
                         select_params = select_control(min_ntree=5000),
                         num_processors=1, nodesize) {
@@ -59,7 +59,6 @@ fuzzyforest <- function(X, y, module_membership,
   ntree_factor <- screen_control$ntree_factor
   min_ntree <- screen_control$min_ntree
   keep_fraction <- screen_control$keep_fraction
-
   if(ncol(X)*keep_fraction < select_control$number_selected){
     warning(c("ncol(X)*keep_fraction < number_selected", "\n",
               "number_selected will be set to floor(ncol(X)*keep_fraction)"))
@@ -181,7 +180,7 @@ fuzzyforest <- function(X, y, module_membership,
 #'                          5 if regression.
 #' @return A data.frame with the top ranked features.
 #' @note This work was partially funded by NSF IIS 1251151.
-WGCNA_fuzzyforest <- function(X, y, WGCNA_params=WGCNA_control(p=6),
+wff <- function(X, y, WGCNA_params=WGCNA_control(p=6),
                         screen_params=screen_control(min_ntree=5000),
                         select_params=select_control(min_ntree=5000),
                         num_processors=1, nodesize) {
@@ -210,7 +209,7 @@ WGCNA_fuzzyforest <- function(X, y, WGCNA_params=WGCNA_control(p=6),
   screen_mtry_factor <- screen_control$mtry_factor
   screen_ntree_factor <- screen_control$ntree_factor
   screen_min_ntree <- screen_control$min_ntree
-  out <- fuzzyforest(X, y, module_membership,
+  out <- ff(X, y, module_membership,
                     screen_control, select_control,
                     num_processors, nodesize=nodesize)
   out$WGCNA_object <- bwise
