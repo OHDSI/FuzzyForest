@@ -51,6 +51,11 @@ ff <- function(X, y, module_membership,
   screen_control <- screen_params
   select_control <-  select_params
   module_list <- unique(module_membership)
+#   tryCatch({
+#     parallel::stopCluster(cl)},
+#     warning = function(w) {},
+#     error = function(e) {},
+#     finally = {})
   cl = parallel::makeCluster(num_processors)
   doParallel::registerDoParallel(cl)
   survivors <- vector('list', length(module_list))
@@ -122,7 +127,8 @@ ff <- function(X, y, module_membership,
   }
   survivor_list <- survivors
   names(survivor_list) <- module_list
-  parallel::stopCluster(cl)
+#   suppressWarnings(stopImplicitCluster())
+#   suppressWarnings(parallel::stopCluster(cl))
   survivors <- do.call('rbind', survivors)
   survivors <- as.data.frame(survivors, stringsAsFactors = FALSE)
   survivors[, 2] <- as.numeric(survivors[, 2])
@@ -150,6 +156,7 @@ ff <- function(X, y, module_membership,
                            nodesize=nodesize)
   out <- fuzzy_forest(final_list, final_rf, module_membership,
                       survivor_list=survivor_list, selection_list=selection_list)
+
   return(out)
 }
 
