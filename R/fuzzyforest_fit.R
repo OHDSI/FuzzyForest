@@ -5,9 +5,9 @@
 #' @export
 #' @param X                 A data.frame.
 #'                          Each column corresponds to a feature vectors.
-#' @param y                 Response vector.  For classification y should be
-#'                          a factor.  If y takes on only two values, y will
-#'                          be coerced into a factor.
+#' @param y                 Response vector.  For classification, y should be a
+#'                          factor or a character.  For regression, y should be
+#'                          numeric.
 #' @param module_membership A vector giving module membership of each feature.
 #' @param screen_params     Parameters for screening step of fuzzy forests.
 #'                          See \code{\link[fuzzyforest]{screen_control}} for details.
@@ -19,7 +19,12 @@
 #'                          \code{select_control}.
 #' @param num_processors    Number of processors used to fit random forests.
 #' @param nodesize          Minimum terminal nodesize. 1 if classification.
-#'                          5 if regression.
+#'                          5 if regression.  If the sample size is very large,
+#'                          the trees will be grown extremely deep.
+#'                          This may lead to issues with memory usage and may
+#'                          lead to significant increases in the time it takes
+#'                          the algorithm to run.  In this case,
+#'                          it may be useful to increase \code{nodesize}.
 #' @examples
 #' n <- 500
 #' minCor = .66
@@ -139,6 +144,9 @@ ff <- function(X, y, module_membership,
   colnames(final_list) <- c("feature_name", "variable_importance")
   final_list <- as.data.frame(final_list, stringsAsFactors=FALSE)
   final_list[, 2] <- as.numeric(final_list[, 2])
+  select_mods <- module_membership[which(names(X) %in% final_list[,1])]
+  final_list <- cbind(final_list, select_mods,stringsAsFactors=FALSE)
+  names(final_list)[3] <- "module_membership"
   final_X <- X[, names(X) %in% final_list[, 1],drop=FALSE]
   if(CLASSIFICATION == TRUE) {
     final_mtry <- ceiling(select_control$mtry_factor*ncol(final_list)/3)
@@ -148,6 +156,8 @@ ff <- function(X, y, module_membership,
   }
   final_rf <- randomForest(x=final_X, y=y, mtry=final_mtry, importance=TRUE,
                            nodesize=nodesize)
+  module_membership <- as.data.frame(cbind(names(X), module_membership))
+  names(module_membership) <- c("feature_name", "module")
   out <- fuzzy_forest(final_list, final_rf, module_membership,
                       survivor_list=survivor_list, selection_list=selection_list)
 
@@ -162,7 +172,9 @@ ff <- function(X, y, module_membership,
 #' @export
 #' @param X                 A data.frame.
 #'                          Each column corresponds to a feature vectors.
-#' @param y                 Response vector.
+#' @param y                 Response vector.  For classification, y should be a
+#'                          factor or a character.  For regression, y should be
+#'                          numeric.
 #' @param WGCNA_params      Parameters for WGCNA.
 #'                          See \code{\link[WGCNA]{blockwiseModules}} and
 #'                          \code{\link[fuzzyforest]{WGCNA_control}} for details.
@@ -178,7 +190,12 @@ ff <- function(X, y, module_membership,
 #'                          \code{select_control}.
 #' @param num_processors    Number of processors.
 #' @param nodesize          Minimum terminal nodesize. 1 if classification.
-#'                          5 if regression.
+#'                          5 if regression.  If the sample size is very large,
+#'                          the trees will be grown extremely deep.
+#'                          This may lead to issues with memory usage and may
+#'                          lead to significant increases in the time it takes
+#'                          the algorithm to run.  In this case,
+#'                          it may be useful to increase \code{nodesize}.
 #' @return A data.frame with the top ranked features.
 #' @note This work was partially funded by NSF IIS 1251151.
 wff <- function(X, y, WGCNA_params=WGCNA_control(p=6),
