@@ -12,9 +12,9 @@ ff(X, y, module_membership, screen_params = screen_control(min_ntree = 5000),
 \item{X}{A data.frame.
 Each column corresponds to a feature vectors.}
 
-\item{y}{Response vector.  For classification y should be
-a factor.  If y takes on only two values, y will
-be coerced into a factor.}
+\item{y}{Response vector.  For classification, y should be a
+factor or a character.  For regression, y should be
+numeric.}
 
 \item{module_membership}{A vector giving module membership of each feature.}
 
@@ -31,7 +31,12 @@ See \code{\link[fuzzyforest]{select_control}} for details.
 \item{num_processors}{Number of processors used to fit random forests.}
 
 \item{nodesize}{Minimum terminal nodesize. 1 if classification.
-5 if regression.}
+5 if regression.  If the sample size is very large,
+the trees will be grown extremely deep.
+This may lead to issues with memory usage and may
+lead to significant increases in the time it takes
+the algorithm to run.  In this case,
+it may be useful to increase \code{nodesize}.}
 }
 \value{
 A data.frame with the top ranked features.

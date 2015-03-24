@@ -13,7 +13,9 @@ wff(X, y, WGCNA_params = WGCNA_control(p = 6),
 \item{X}{A data.frame.
 Each column corresponds to a feature vectors.}
 
-\item{y}{Response vector.}
+\item{y}{Response vector.  For classification, y should be a
+factor or a character.  For regression, y should be
+numeric.}
 
 \item{WGCNA_params}{Parameters for WGCNA.
 See \code{\link[WGCNA]{blockwiseModules}} and
@@ -34,7 +36,12 @@ See \code{\link[fuzzyforest]{select_control}} for details.
 \item{num_processors}{Number of processors.}
 
 \item{nodesize}{Minimum terminal nodesize. 1 if classification.
-5 if regression.}
+5 if regression.  If the sample size is very large,
+the trees will be grown extremely deep.
+This may lead to issues with memory usage and may
+lead to significant increases in the time it takes
+the algorithm to run.  In this case,
+it may be useful to increase \code{nodesize}.}
 }
 \value{
 A data.frame with the top ranked features.
