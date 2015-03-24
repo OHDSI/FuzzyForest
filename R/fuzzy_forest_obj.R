@@ -67,20 +67,11 @@ predict.fuzzy_forest <- function(object, new_data, ...) {
 
 plot.fuzzy_forest <- function(x, ...) {
   fuzzy_forest <- x
-  ultimate_survivors = as.numeric(gsub("V([0-9]+)"
-                                       , "\\1"
-                                       , row.names(fuzzy_forest$final_rf$importance)
-  )
-  )
-  us_modules = rep(NA, length(ultimate_survivors))
-  for (i in 1:length(ultimate_survivors)){
-    j = ultimate_survivors[i]
-    us_modules[i] = fuzzy_forest$module_membership[[j]]
-  }
+  us_modules <- fuzzy_forest$feature_list$module_membership
   us_modules = as.data.frame(prop.table(table(us_modules))*100)
   us_modules = cbind(us_modules, rep("us", nrow(us_modules)))
   names(us_modules) = c("module", "percent", "type")
-  df = as.data.frame(prop.table(table(fuzzy_forest$module_membership))*100)
+  df = as.data.frame(prop.table(table(fuzzy_forest$module_membership[, 2]))*100)
   df = cbind(df, rep("overall", nrow(df)))
   names(df) = c("module", "percent", "type")
   df = rbind(df
