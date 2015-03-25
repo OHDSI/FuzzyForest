@@ -17,6 +17,8 @@
 #'                          See \code{\link[fuzzyforest]{select_control}} for details.
 #'                          \code{select_params} is an object of type
 #'                          \code{select_control}.
+#' @param final_ntree       Number trees grown in the final random forest.
+#'                          This random forest contains all selected features.
 #' @param num_processors    Number of processors used to fit random forests.
 #' @param nodesize          Minimum terminal nodesize. 1 if classification.
 #'                          5 if regression.  If the sample size is very large,
@@ -51,6 +53,7 @@
 ff <- function(X, y, module_membership,
                         screen_params = screen_control(min_ntree=5000),
                         select_params = select_control(min_ntree=5000),
+                        final_ntree = 500,
                         num_processors=1, nodesize) {
   CLASSIFICATION <- is.factor(y)
   screen_control <- screen_params
@@ -154,8 +157,8 @@ ff <- function(X, y, module_membership,
   if(CLASSIFICATION == FALSE) {
     final_mtry <- ceiling(select_control$mtry_factor*sqrt(ncol(final_list)))
   }
-  final_rf <- randomForest(x=final_X, y=y, mtry=final_mtry, importance=TRUE,
-                           nodesize=nodesize)
+  final_rf <- randomForest(x=final_X, y=y, mtry=final_mtry, ntree=final_ntree,
+                           importance=TRUE, nodesize=nodesize)
   module_membership <- as.data.frame(cbind(names(X), module_membership))
   names(module_membership) <- c("feature_name", "module")
   out <- fuzzy_forest(final_list, final_rf, module_membership,
@@ -188,7 +191,8 @@ ff <- function(X, y, module_membership,
 #'                          See \code{\link[fuzzyforest]{select_control}} for details.
 #'                          \code{select_params} is an object of type
 #'                          \code{select_control}.
-#' @param num_processors    Number of processors.
+#' @param final_ntree       Number trees grown in the final random forest.
+#'                          This random forest contains all selected features.
 #' @param nodesize          Minimum terminal nodesize. 1 if classification.
 #'                          5 if regression.  If the sample size is very large,
 #'                          the trees will be grown extremely deep.
@@ -201,7 +205,7 @@ ff <- function(X, y, module_membership,
 wff <- function(X, y, WGCNA_params=WGCNA_control(p=6),
                         screen_params=screen_control(min_ntree=5000),
                         select_params=select_control(min_ntree=5000),
-                        num_processors=1, nodesize) {
+                        final_ntree=500, num_processors=1, nodesize) {
   #browser()
   CLASSIFICATION <- is.factor(y)
   if(CLASSIFICATION == TRUE) {
@@ -228,7 +232,7 @@ wff <- function(X, y, WGCNA_params=WGCNA_control(p=6),
   screen_ntree_factor <- screen_control$ntree_factor
   screen_min_ntree <- screen_control$min_ntree
   out <- ff(X, y, module_membership,
-                    screen_control, select_control,
+                    screen_control, select_control, final_ntree,
                     num_processors, nodesize=nodesize)
   out$WGCNA_object <- bwise
   return(out)

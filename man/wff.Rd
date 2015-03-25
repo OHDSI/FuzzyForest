@@ -6,8 +6,8 @@
 \usage{
 wff(X, y, WGCNA_params = WGCNA_control(p = 6),
   screen_params = screen_control(min_ntree = 5000),
-  select_params = select_control(min_ntree = 5000), num_processors = 1,
-  nodesize)
+  select_params = select_control(min_ntree = 5000), final_ntree = 500,
+  num_processors = 1, nodesize)
 }
 \arguments{
 \item{X}{A data.frame.
@@ -33,7 +33,8 @@ See \code{\link[fuzzyforest]{select_control}} for details.
 \code{select_params} is an object of type
 \code{select_control}.}
 
-\item{num_processors}{Number of processors.}
+\item{final_ntree}{Number trees grown in the final random forest.
+This random forest contains all selected features.}
 
 \item{nodesize}{Minimum terminal nodesize. 1 if classification.
 5 if regression.  If the sample size is very large,
