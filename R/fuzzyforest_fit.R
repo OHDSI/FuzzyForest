@@ -71,7 +71,7 @@ ff <- function(X, y, module_membership,
   if(ncol(X)*keep_fraction < select_control$number_selected){
     warning(c("ncol(X)*keep_fraction < number_selected", "\n",
               "number_selected will be set to floor(ncol(X)*keep_fraction)"))
-              select_control$number_selected <- floor(ncol(X)*keep_fraction)
+              select_control$number_selected <- max(floor(ncol(X)*keep_fraction), 1)
   }
 
   for (i in 1:length(module_list)) {
@@ -79,13 +79,13 @@ ff <- function(X, y, module_membership,
     num_features <- ncol(module)
     #TUNING PARAMETER mtry_factor
     if(CLASSIFICATION == TRUE) {
-      mtry <- ceiling(mtry_factor*num_features/3)
+      mtry <- min(ceiling(mtry_factor*num_features/3), num_features)
       if(missing(nodesize)){
         nodesize <- 1
       }
     }
     if(CLASSIFICATION == FALSE) {
-      mtry <- ceiling(mtry_factor*sqrt(num_features))
+      mtry <- min(ceiling(mtry_factor*sqrt(num_features)), num_features)
       if(missing(nodesize)){
         nodesize <- 5
       }
@@ -110,10 +110,10 @@ ff <- function(X, y, module_membership,
           module <- module[, which(names(module) %in% features)]
           num_features <- length(features)
           if(CLASSIFICATION == TRUE) {
-            mtry <- ceiling(mtry_factor*num_features/3)
+            mtry <- min(ceiling(mtry_factor*num_features/3), num_features)
           }
           if(CLASSIFICATION == FALSE) {
-            mtry <- ceiling(mtry_factor*sqrt(num_features))
+            mtry <- min(ceiling(mtry_factor*sqrt(num_features)), num_features)
           }
           ntree <- max(num_features*ntree_factor, min_ntree)
         }
@@ -148,14 +148,17 @@ ff <- function(X, y, module_membership,
   final_list <- as.data.frame(final_list, stringsAsFactors=FALSE)
   final_list[, 2] <- as.numeric(final_list[, 2])
   select_mods <- module_membership[which(names(X) %in% final_list[,1])]
-  final_list <- cbind(final_list, select_mods,stringsAsFactors=FALSE)
+  final_list <- cbind(final_list, select_mods, stringsAsFactors=FALSE)
   names(final_list)[3] <- "module_membership"
-  final_X <- X[, names(X) %in% final_list[, 1],drop=FALSE]
+  final_X <- X[, names(X) %in% final_list[, 1], drop=FALSE]
+  current_p <- dim(final_X)[2]
   if(CLASSIFICATION == TRUE) {
-    final_mtry <- ceiling(select_control$mtry_factor*ncol(final_list)/3)
+    final_mtry <- min(ceiling(select_control$mtry_factor*current_p/3),
+                      current_p)
   }
   if(CLASSIFICATION == FALSE) {
-    final_mtry <- ceiling(select_control$mtry_factor*sqrt(ncol(final_list)))
+    final_mtry <- min(ceiling(select_control$mtry_factor*current_p),
+                      current_p)
   }
   final_rf <- randomForest(x=final_X, y=y, mtry=final_mtry, ntree=final_ntree,
                            importance=TRUE, nodesize=nodesize)
@@ -193,6 +196,7 @@ ff <- function(X, y, module_membership,
 #'                          \code{select_control}.
 #' @param final_ntree       Number trees grown in the final random forest.
 #'                          This random forest contains all selected features.
+#' @param num_processors    Number of processors used to fit random forests.
 #' @param nodesize          Minimum terminal nodesize. 1 if classification.
 #'                          5 if regression.  If the sample size is very large,
 #'                          the trees will be grown extremely deep.

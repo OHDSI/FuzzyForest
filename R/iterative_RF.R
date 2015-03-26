@@ -30,7 +30,7 @@ iterative_RF <- function(X, y, drop_fraction, keep_fraction, mtry_factor,
   cl = parallel::makeCluster(num_processors)
   doParallel::registerDoParallel(cl)
   num_features <- ncol(X)
-  mtry <- ceiling(mtry_factor*sqrt(num_features))
+  mtry <- min(ceiling(mtry_factor*sqrt(num_features)), dim(X)[2])
   ntree <- max(num_features*ntree_factor, min_ntree)
   target <- ceiling(num_features * keep_fraction)
   current_X <- X
@@ -50,7 +50,7 @@ iterative_RF <- function(X, y, drop_fraction, keep_fraction, mtry_factor,
       features <- row.names(trimmed_varlist)
       current_X <- current_X[, which(names(current_X) %in% features)]
       num_features <- length(features)
-      mtry <- ceiling(mtry_factor*sqrt(num_features))
+      mtry <- min(ceiling(mtry_factor*sqrt(num_features)), dim(current_X)[2])
       ntree <- max(num_features*ntree_factor, min_ntree)
     }
     else {
@@ -99,7 +99,7 @@ select_RF <- function(X, y, drop_fraction, number_selected, mtry_factor,
   cl = parallel::makeCluster(num_processors)
   doParallel::registerDoParallel(cl)
   num_features <- ncol(X)
-  mtry <- ceiling(mtry_factor*sqrt(num_features))
+  mtry <- min(ceiling(mtry_factor*sqrt(num_features)), dim(X)[2])
   ntree <- max(num_features*ntree_factor, min_ntree)
   target <- number_selected
   current_X <- X
@@ -125,7 +125,7 @@ select_RF <- function(X, y, drop_fraction, number_selected, mtry_factor,
       features <- row.names(trimmed_varlist)
       current_X <- current_X[, which(names(current_X) %in% features)]
       num_features <- length(features)
-      mtry <- ceiling(mtry_factor*sqrt(num_features))
+      mtry <- min(ceiling(mtry_factor*sqrt(num_features)), dim(current_X)[2])
       ntree <- max(num_features*ntree_factor, min_ntree)
     }
     else {
