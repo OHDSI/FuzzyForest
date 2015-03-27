@@ -4,7 +4,7 @@
 \alias{wff}
 \title{Fits WGCNA based fuzzy forest algorithm.}
 \usage{
-wff(X, y, WGCNA_params = WGCNA_control(p = 6),
+wff(X, y, Z, WGCNA_params = WGCNA_control(p = 6),
   screen_params = screen_control(min_ntree = 5000),
   select_params = select_control(min_ntree = 5000), final_ntree = 500,
   num_processors = 1, nodesize)
@@ -16,6 +16,10 @@ Each column corresponds to a feature vectors.}
 \item{y}{Response vector.  For classification, y should be a
 factor or a character.  For regression, y should be
 numeric.}
+
+\item{Z}{Additional features that are not to be screened out
+at the screening step.  WGCNA is not carried out on
+features in Z.}
 
 \item{WGCNA_params}{Parameters for WGCNA.
 See \code{\link[WGCNA]{blockwiseModules}} and
@@ -35,6 +39,8 @@ See \code{\link[fuzzyforest]{select_control}} for details.
 
 \item{final_ntree}{Number trees grown in the final random forest.
 This random forest contains all selected features.}
+
+\item{num_processors}{Number of processors used to fit random forests.}
 
 \item{nodesize}{Minimum terminal nodesize. 1 if classification.
 5 if regression.  If the sample size is very large,

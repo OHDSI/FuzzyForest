@@ -68,6 +68,7 @@ predict.fuzzy_forest <- function(object, new_data, ...) {
 plot.fuzzy_forest <- function(x, ...) {
   fuzzy_forest <- x
   us_modules <- fuzzy_forest$feature_list$module_membership
+  us_modules <- us_modules[us_modules != "."]
   us_modules = as.data.frame(prop.table(table(us_modules))*100)
   us_modules = cbind(us_modules, rep("us", nrow(us_modules)))
   names(us_modules) = c("module", "percent", "type")

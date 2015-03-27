@@ -8,6 +8,8 @@
 #' @param y                 Response vector.  For classification, y should be a
 #'                          factor or a character.  For regression, y should be
 #'                          numeric.
+#' @param Z                 Additional features that are not to be screened out
+#'                          at the screening step.
 #' @param module_membership A vector giving module membership of each feature.
 #' @param screen_params     Parameters for screening step of fuzzy forests.
 #'                          See \code{\link[fuzzyforest]{screen_control}} for details.
@@ -27,30 +29,9 @@
 #'                          lead to significant increases in the time it takes
 #'                          the algorithm to run.  In this case,
 #'                          it may be useful to increase \code{nodesize}.
-#' @examples
-#' n <- 500
-#' minCor = .66
-#' seed1 <- rnorm(n)
-#' seed2 <- rnorm(n)
-#' p <- 100
-#' X1 <- WGCNA::simulateModule(seed1, nGenes=p/2, minCor=.66, maxCor=.99,
-#'                      propNegativeCor=.01)
-#' X2 <- WGCNA::simulateModule(seed2, nGenes=p/2, minCor=.66, maxCor=.99,
-#'                      propNegativeCor=.01)
-#' beta1 <- c(c(5, 2, 1, 0, 0), rep(0, p/2-5))
-#' beta2 <- beta1
-#' X <- cbind(X1, X2)
-#' beta <- c(beta1, beta2)
-#' y <- X%*%beta + rnorm(n)
-#' X <- as.data.frame(X)
-#' names(X) <- paste("V",1:p,sep="")
-#' module_membership <- as.character(rep(1:2,each=p/2))
-#' fit <- ff(X, y, module_membership,
-#'                   screen_params=screen_control(min_ntree=100),
-#'                   select_params=select_control(number_selected=3, min_ntree=100))
 #' @return A data.frame with the top ranked features.
 #' @note This work was partially funded by NSF IIS 1251151.
-ff <- function(X, y, module_membership,
+ff <- function(X, y, Z=NULL, module_membership,
                         screen_params = screen_control(min_ntree=5000),
                         select_params = select_control(min_ntree=5000),
                         final_ntree = 500,
@@ -136,6 +117,9 @@ ff <- function(X, y, module_membership,
   survivors[, 2] <- as.numeric(survivors[, 2])
   names(survivors) <- c("featureID", "Permutation VIM")
   X_surv <- X[, names(X) %in% survivors[,1]]
+  if(!is.null(Z)) {
+    X_surv <- cbind(X_surv, Z, stringsAsFactors=FALSE)
+  }
   select_args <- list(X_surv, y, num_processors, nodesize)
   select_args <- c(select_args, select_control)
   names(select_args)[1:4] <- c("X", "y", "num_processors", "nodesize")
@@ -147,10 +131,15 @@ ff <- function(X, y, module_membership,
   colnames(final_list) <- c("feature_name", "variable_importance")
   final_list <- as.data.frame(final_list, stringsAsFactors=FALSE)
   final_list[, 2] <- as.numeric(final_list[, 2])
+  final_list <- cbind(final_list, rep(".", dim(final_list)[2]), stringsAsFactors=FALSE)
+  names(final_list)[3] <- c("module_membership")
   select_mods <- module_membership[which(names(X) %in% final_list[,1])]
-  final_list <- cbind(final_list, select_mods, stringsAsFactors=FALSE)
-  names(final_list)[3] <- "module_membership"
+  final_list[, 3][which(final_list[,1] %in% names(X))] <- select_mods
   final_X <- X[, names(X) %in% final_list[, 1], drop=FALSE]
+  if(!is.null(Z)) {
+    final_X <- cbind(final_X, Z[, names(Z) %in% final_list[, 1], drop=FALSE],
+                     stringsAsFactors=FALSE)
+  }
   current_p <- dim(final_X)[2]
   if(CLASSIFICATION == TRUE) {
     final_mtry <- min(ceiling(select_control$mtry_factor*current_p/3),
@@ -181,6 +170,9 @@ ff <- function(X, y, module_membership,
 #' @param y                 Response vector.  For classification, y should be a
 #'                          factor or a character.  For regression, y should be
 #'                          numeric.
+#' @param Z                 Additional features that are not to be screened out
+#'                          at the screening step.  WGCNA is not carried out on
+#'                          features in Z.
 #' @param WGCNA_params      Parameters for WGCNA.
 #'                          See \code{\link[WGCNA]{blockwiseModules}} and
 #'                          \code{\link[fuzzyforest]{WGCNA_control}} for details.
@@ -206,7 +198,7 @@ ff <- function(X, y, module_membership,
 #'                          it may be useful to increase \code{nodesize}.
 #' @return A data.frame with the top ranked features.
 #' @note This work was partially funded by NSF IIS 1251151.
-wff <- function(X, y, WGCNA_params=WGCNA_control(p=6),
+wff <- function(X, y, Z=NULL, WGCNA_params=WGCNA_control(p=6),
                         screen_params=screen_control(min_ntree=5000),
                         select_params=select_control(min_ntree=5000),
                         final_ntree=500, num_processors=1, nodesize) {
@@ -235,7 +227,7 @@ wff <- function(X, y, WGCNA_params=WGCNA_control(p=6),
   screen_mtry_factor <- screen_control$mtry_factor
   screen_ntree_factor <- screen_control$ntree_factor
   screen_min_ntree <- screen_control$min_ntree
-  out <- ff(X, y, module_membership,
+  out <- ff(X, y, Z, module_membership,
                     screen_control, select_control, final_ntree,
                     num_processors, nodesize=nodesize)
   out$WGCNA_object <- bwise

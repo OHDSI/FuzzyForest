@@ -4,7 +4,8 @@
 \alias{ff}
 \title{Fits fuzzy forest algorithm.}
 \usage{
-ff(X, y, module_membership, screen_params = screen_control(min_ntree = 5000),
+ff(X, y, Z = NULL, module_membership,
+  screen_params = screen_control(min_ntree = 5000),
   select_params = select_control(min_ntree = 5000), final_ntree = 500,
   num_processors = 1, nodesize)
 }
@@ -15,6 +16,9 @@ Each column corresponds to a feature vectors.}
 \item{y}{Response vector.  For classification, y should be a
 factor or a character.  For regression, y should be
 numeric.}
+
+\item{Z}{Additional features that are not to be screened out
+at the screening step.}
 
 \item{module_membership}{A vector giving module membership of each feature.}
 
@@ -50,27 +54,5 @@ fuzzy forest object.
 }
 \note{
 This work was partially funded by NSF IIS 1251151.
-}
-\examples{
-n <- 500
-minCor = .66
-seed1 <- rnorm(n)
-seed2 <- rnorm(n)
-p <- 100
-X1 <- WGCNA::simulateModule(seed1, nGenes=p/2, minCor=.66, maxCor=.99,
-                     propNegativeCor=.01)
-X2 <- WGCNA::simulateModule(seed2, nGenes=p/2, minCor=.66, maxCor=.99,
-                     propNegativeCor=.01)
-beta1 <- c(c(5, 2, 1, 0, 0), rep(0, p/2-5))
-beta2 <- beta1
-X <- cbind(X1, X2)
-beta <- c(beta1, beta2)
-y <- X\%*\%beta + rnorm(n)
-X <- as.data.frame(X)
-names(X) <- paste("V",1:p,sep="")
-module_membership <- as.character(rep(1:2,each=p/2))
-fit <- ff(X, y, module_membership,
-                  screen_params=screen_control(min_ntree=100),
-                  select_params=select_control(number_selected=3, min_ntree=100))
 }
 

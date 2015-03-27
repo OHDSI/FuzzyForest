@@ -9,7 +9,9 @@ select_RF(X, y, drop_fraction, number_selected, mtry_factor, ntree_factor,
 }
 \arguments{
 \item{X}{A data.frame.
-Each column corresponds to a feature vectors.}
+Each column corresponds to a feature vectors.
+Could include additional covariates not a part of
+the original modules.}
 
 \item{y}{Response vector.}
 

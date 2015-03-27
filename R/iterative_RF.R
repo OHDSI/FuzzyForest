@@ -89,6 +89,8 @@ iterative_RF <- function(X, y, drop_fraction, keep_fraction, mtry_factor,
 #' @export
 #' @param X                 A data.frame.
 #'                          Each column corresponds to a feature vectors.
+#'                          Could include additional covariates not a part of
+#'                          the original modules.
 #' @param y                 Response vector.
 #' @param drop_fraction     A number between 0 and 1.  Percentage of features
 #'                          dropped at each iteration.
