@@ -27,10 +27,23 @@
 iterative_RF <- function(X, y, drop_fraction, keep_fraction, mtry_factor,
                          ntree_factor = 10, min_ntree=5000,
                          num_processors = 1, nodesize) {
+  CLASSIFICATION <- is.factor(y)
   cl = parallel::makeCluster(num_processors)
   doParallel::registerDoParallel(cl)
   num_features <- ncol(X)
-  mtry <- min(ceiling(mtry_factor*sqrt(num_features)), dim(X)[2])
+  #TUNING PARAMETER mtry_factor
+  if(CLASSIFICATION == TRUE) {
+    mtry <- min(ceiling(mtry_factor*num_features/3), num_features)
+    if(missing(nodesize)){
+      nodesize <- 1
+    }
+  }
+  if(CLASSIFICATION == FALSE) {
+    mtry <- min(ceiling(mtry_factor*sqrt(num_features)), num_features)
+    if(missing(nodesize)){
+      nodesize <- 5
+    }
+  }
   ntree <- max(num_features*ntree_factor, min_ntree)
   target <- ceiling(num_features * keep_fraction)
   current_X <- X
@@ -49,8 +62,12 @@ iterative_RF <- function(X, y, drop_fraction, keep_fraction, mtry_factor,
       trimmed_varlist <- var_importance[1:(num_features - reduction), ,drop=FALSE]
       features <- row.names(trimmed_varlist)
       current_X <- current_X[, which(names(current_X) %in% features)]
-      num_features <- length(features)
-      mtry <- min(ceiling(mtry_factor*sqrt(num_features)), dim(current_X)[2])
+      if(CLASSIFICATION == TRUE) {
+        mtry <- min(ceiling(mtry_factor*num_features/3), num_features)
+      }
+      if(CLASSIFICATION == FALSE) {
+        mtry <- min(ceiling(mtry_factor*sqrt(num_features)), num_features)
+      }
       ntree <- max(num_features*ntree_factor, min_ntree)
     }
     else {
