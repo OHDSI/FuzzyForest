@@ -29,7 +29,10 @@
 #'                          lead to significant increases in the time it takes
 #'                          the algorithm to run.  In this case,
 #'                          it may be useful to increase \code{nodesize}.
-#' @return A data.frame with the top ranked features.
+#' @return An object of type \code{\link[fuzzyforest]{fuzzy_forest}}.  This
+#' object is a list containing useful output of fuzzy forests.
+#' It particular it contains a data.frame with list of selected features.
+#' It also includes the random forest fit using the selected features.
 #' @note This work was partially funded by NSF IIS 1251151.
 ff <- function(X, y, Z=NULL, module_membership,
                         screen_params = screen_control(min_ntree=5000),
@@ -196,7 +199,11 @@ ff <- function(X, y, Z=NULL, module_membership,
 #'                          lead to significant increases in the time it takes
 #'                          the algorithm to run.  In this case,
 #'                          it may be useful to increase \code{nodesize}.
-#' @return A data.frame with the top ranked features.
+#' @return An object of type \code{\link[fuzzyforest]{fuzzy_forest}}.  This
+#' object is a list containing useful output of fuzzy forests.
+#' It particular it contains a data.frame with list of selected features.
+#' It also includes the random forest fit using the selected features.
+#'
 #' @note This work was partially funded by NSF IIS 1251151.
 wff <- function(X, y, Z=NULL, WGCNA_params=WGCNA_control(p=6),
                         screen_params=screen_control(min_ntree=5000),

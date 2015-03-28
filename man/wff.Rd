@@ -4,7 +4,7 @@
 \alias{wff}
 \title{Fits WGCNA based fuzzy forest algorithm.}
 \usage{
-wff(X, y, Z, WGCNA_params = WGCNA_control(p = 6),
+wff(X, y, Z = NULL, WGCNA_params = WGCNA_control(p = 6),
   screen_params = screen_control(min_ntree = 5000),
   select_params = select_control(min_ntree = 5000), final_ntree = 500,
   num_processors = 1, nodesize)
@@ -51,7 +51,10 @@ the algorithm to run.  In this case,
 it may be useful to increase \code{nodesize}.}
 }
 \value{
-A data.frame with the top ranked features.
+An object of type \code{\link[fuzzyforest]{fuzzy_forest}}.  This
+object is a list containing useful output of fuzzy forests.
+It particular it contains a data.frame with list of selected features.
+It also includes the random forest fit using the selected features.
 }
 \description{
 Fits fuzzy forest algorithm using WGCNA.  Returns
