@@ -29,37 +29,10 @@
 #'                          lead to significant increases in the time it takes
 #'                          the algorithm to run.  In this case,
 #'                          it may be useful to increase \code{nodesize}.
-<<<<<<< HEAD
-#' @return A data.frame with the top ranked features.
-||||||| merged common ancestors
-#' @examples
-#' n <- 500
-#' minCor = .66
-#' seed1 <- rnorm(n)
-#' seed2 <- rnorm(n)
-#' p <- 100
-#' X1 <- WGCNA::simulateModule(seed1, nGenes=p/2, minCor=.66, maxCor=.99,
-#'                      propNegativeCor=.01)
-#' X2 <- WGCNA::simulateModule(seed2, nGenes=p/2, minCor=.66, maxCor=.99,
-#'                      propNegativeCor=.01)
-#' beta1 <- c(c(5, 2, 1, 0, 0), rep(0, p/2-5))
-#' beta2 <- beta1
-#' X <- cbind(X1, X2)
-#' beta <- c(beta1, beta2)
-#' y <- X%*%beta + rnorm(n)
-#' X <- as.data.frame(X)
-#' names(X) <- paste("V",1:p,sep="")
-#' module_membership <- as.character(rep(1:2,each=p/2))
-#' fit <- ff(X, y, module_membership,
-#'                   screen_params=screen_control(min_ntree=100),
-#'                   select_params=select_control(number_selected=3, min_ntree=100))
-#' @return A data.frame with the top ranked features.
-=======
 #' @return An object of type \code{\link[fuzzyforest]{fuzzy_forest}}.  This
 #' object is a list containing useful output of fuzzy forests.
 #' It particular it contains a data.frame with list of selected features.
 #' It also includes the random forest fit using the selected features.
->>>>>>> master
 #' @note This work was partially funded by NSF IIS 1251151.
 ff <- function(X, y, Z=NULL, module_membership,
                         screen_params = screen_control(min_ntree=5000),
