@@ -154,7 +154,8 @@ ff <- function(X, y, Z=NULL, module_membership,
   }
   final_rf <- randomForest(x=final_X, y=y, mtry=final_mtry, ntree=final_ntree,
                            importance=TRUE, nodesize=nodesize)
-  module_membership <- as.data.frame(cbind(names(X), module_membership))
+  module_membership <- as.data.frame(cbind(names(X), module_membership),
+                                     stringsAsFactors=FALSE)
   names(module_membership) <- c("feature_name", "module")
   out <- fuzzy_forest(final_list, final_rf, module_membership,
                       survivor_list=survivor_list, selection_list=selection_list)
