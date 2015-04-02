@@ -134,10 +134,14 @@ ff <- function(X, y, Z=NULL, module_membership,
   colnames(final_list) <- c("feature_name", "variable_importance")
   final_list <- as.data.frame(final_list, stringsAsFactors=FALSE)
   final_list[, 2] <- as.numeric(final_list[, 2])
-  final_list <- cbind(final_list, rep(".", dim(final_list)[2]), stringsAsFactors=FALSE)
+  final_list <- cbind(final_list, rep(".", dim(final_list)[1]),
+                     stringsAsFactors=FALSE)
   names(final_list)[3] <- c("module_membership")
+  select_X <- names(X)[which(names(X) %in% final_list[, 1])]
   select_mods <- module_membership[which(names(X) %in% final_list[,1])]
-  final_list[, 3][which(final_list[,1] %in% names(X))] <- select_mods
+  select_order <- final_list[, 1][which(final_list[,1] %in% names(X))]
+  select_mods <- select_mods[match(select_order, select_X)]
+  final_list[, 3][final_list[, 1] %in% names(X)] <- select_mods
   final_X <- X[, names(X) %in% final_list[, 1], drop=FALSE]
   if(!is.null(Z)) {
     final_X <- cbind(final_X, Z[, names(Z) %in% final_list[, 1], drop=FALSE],
