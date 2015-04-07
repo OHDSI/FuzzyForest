@@ -95,7 +95,12 @@ modplot <- function(object, main=NULL, xlab=NULL, ylab=NULL,
 
     select_mods <- as.factor(object$feature_list[, 3])
     select_key <- module_labels[which(module_labels[, 1] %in% levels(select_mods)), ,drop=FALSE]
-    levels(select_mods)[-1] <- select_key[, 2]
+    if( "." %in% levels(select_mods)) {
+      levels(select_mods)[-1] <- select_key[, 2]
+    }
+    else {
+      levels(select_mods) <- select_key[, 2]
+    }
     object$feature_list[, 3] <- as.character(select_mods)
   }
   fuzzy_forest <- object
