@@ -20,8 +20,6 @@ modplot(object, main = NULL, xlab = NULL, ylab = NULL,
 or character matrix with first column giving
 the current name of module and second column giving
 the assigned name of each module.}
-
-\item{...}{Additional arguments currently not in use.}
 }
 \description{
 The plot is designed
