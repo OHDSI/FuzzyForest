@@ -1,3 +1,0 @@
-useDynLib(FuzzyForests)
-exportPattern("^[[:alpha:]]+")
-importFrom(Rcpp, evalCpp)
