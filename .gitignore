@@ -1,6 +1,6 @@
 .Rproj.user
 .Rhistory
 .RData
-src/*.o
-src/*.so
+.DS_Store
+test.R
 src/*.dll

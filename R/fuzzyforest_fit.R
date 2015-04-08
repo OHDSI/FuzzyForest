@@ -1,0 +1,253 @@
+#' Fits fuzzy forest algorithm.
+#'
+#' Fits fuzzy forest algorithm.  Returns
+#' fuzzy forest object.
+#' @export
+#' @param X                 A data.frame.
+#'                          Each column corresponds to a feature vectors.
+#' @param y                 Response vector.  For classification, y should be a
+#'                          factor or a character.  For regression, y should be
+#'                          numeric.
+#' @param Z                 Additional features that are not to be screened out
+#'                          at the screening step.
+#' @param module_membership A vector giving module membership of each feature.
+#' @param screen_params     Parameters for screening step of fuzzy forests.
+#'                          See \code{\link[fuzzyforest]{screen_control}} for details.
+#'                          \code{screen_params} is an object of type
+#'                          \code{screen_control}.
+#' @param select_params     Parameters for selection step of fuzzy forests.
+#'                          See \code{\link[fuzzyforest]{select_control}} for details.
+#'                          \code{select_params} is an object of type
+#'                          \code{select_control}.
+#' @param final_ntree       Number trees grown in the final random forest.
+#'                          This random forest contains all selected features.
+#' @param num_processors    Number of processors used to fit random forests.
+#' @param nodesize          Minimum terminal nodesize. 1 if classification.
+#'                          5 if regression.  If the sample size is very large,
+#'                          the trees will be grown extremely deep.
+#'                          This may lead to issues with memory usage and may
+#'                          lead to significant increases in the time it takes
+#'                          the algorithm to run.  In this case,
+#'                          it may be useful to increase \code{nodesize}.
+#' @return An object of type \code{\link[fuzzyforest]{fuzzy_forest}}.  This
+#' object is a list containing useful output of fuzzy forests.
+#' It particular it contains a data.frame with list of selected features.
+#' It also includes the random forest fit using the selected features.
+#' @note This work was partially funded by NSF IIS 1251151.
+ff <- function(X, y, Z=NULL, module_membership,
+                        screen_params = screen_control(min_ntree=5000),
+                        select_params = select_control(min_ntree=5000),
+                        final_ntree = 500,
+                        num_processors=1, nodesize) {
+  CLASSIFICATION <- is.factor(y)
+  screen_control <- screen_params
+  select_control <-  select_params
+  module_list <- unique(module_membership)
+  cl = parallel::makeCluster(num_processors)
+  doParallel::registerDoParallel(cl)
+  on.exit(parallel::stopCluster(cl))
+  survivors <- vector('list', length(module_list))
+  drop_fraction <- screen_control$drop_fraction
+  mtry_factor <- screen_control$mtry_factor
+  ntree_factor <- screen_control$ntree_factor
+  min_ntree <- screen_control$min_ntree
+  keep_fraction <- screen_control$keep_fraction
+  if(ncol(X)*keep_fraction < select_control$number_selected){
+    warning(c("ncol(X)*keep_fraction < number_selected", "\n",
+              "number_selected will be set to floor(ncol(X)*keep_fraction)"))
+              select_control$number_selected <- max(floor(ncol(X)*keep_fraction), 1)
+  }
+
+  for (i in 1:length(module_list)) {
+    module <- X[, which(module_membership == module_list[i])]
+    num_features <- ncol(module)
+    #TUNING PARAMETER mtry_factor
+    if(CLASSIFICATION == TRUE) {
+      mtry <- min(ceiling(mtry_factor*num_features/3), num_features)
+      if(missing(nodesize)){
+        nodesize <- 1
+      }
+    }
+    if(CLASSIFICATION == FALSE) {
+      mtry <- min(ceiling(mtry_factor*sqrt(num_features)), num_features)
+      if(missing(nodesize)){
+        nodesize <- 5
+      }
+    }
+    #TUNING PARAMETER ntree_factor
+    ntree <- max(num_features*ntree_factor, min_ntree)
+    #TUNING PARAMETER keep_fraction
+    target = ceiling(num_features * keep_fraction)
+    while (num_features >= target){
+      rf = `%dopar%`(foreach(ntree = rep(ntree/num_processors, num_processors)
+                     , .combine = combine, .packages = 'randomForest'),
+                     #second argument to '%dopar%'
+                     randomForest(module , y, ntree = ntree, mtry = mtry,
+                     importance = TRUE, scale = FALSE, nodesize=nodesize))
+      var_importance <- importance(rf, type=1, scale=FALSE)
+      var_importance <- var_importance[order(var_importance[, 1],
+                                             decreasing=TRUE), ,drop=FALSE]
+      reduction <- ceiling(num_features*drop_fraction)
+      if(num_features - reduction > target) {
+          trimmed_varlist <- var_importance[1:(num_features - reduction), ,drop=FALSE]
+          features <- row.names(trimmed_varlist)
+          module <- module[, which(names(module) %in% features)]
+          num_features <- length(features)
+          if(CLASSIFICATION == TRUE) {
+            mtry <- min(ceiling(mtry_factor*num_features/3), num_features)
+          }
+          if(CLASSIFICATION == FALSE) {
+            mtry <- min(ceiling(mtry_factor*sqrt(num_features)), num_features)
+          }
+          ntree <- max(num_features*ntree_factor, min_ntree)
+        }
+      else {
+          num_features <- target - 1
+          mod_varlist <- var_importance[, 1][1:target]
+          features <- row.names(var_importance)[1:target]
+          survivors[[i]] <- cbind(features, mod_varlist)
+          row.names(survivors[[i]]) <- NULL
+          survivors[[i]] <- as.data.frame(survivors[[i]])
+          survivors[[i]][, 1] <- as.character(survivors[[i]][, 1])
+          survivors[[i]][, 2] <- as.numeric(as.character(survivors[[i]][, 2]))
+        }
+    }
+  }
+  survivor_list <- survivors
+  names(survivor_list) <- module_list
+  survivors <- do.call('rbind', survivors)
+  survivors <- as.data.frame(survivors, stringsAsFactors = FALSE)
+  survivors[, 2] <- as.numeric(survivors[, 2])
+  names(survivors) <- c("featureID", "Permutation VIM")
+  X_surv <- X[, names(X) %in% survivors[,1]]
+  if(!is.null(Z)) {
+    X_surv <- cbind(X_surv, Z, stringsAsFactors=FALSE)
+  }
+  select_args <- list(X_surv, y, num_processors, nodesize)
+  select_args <- c(select_args, select_control)
+  names(select_args)[1:4] <- c("X", "y", "num_processors", "nodesize")
+  select_results <- do.call("select_RF", select_args)
+  final_list <- select_results[[1]]
+  selection_list <- select_results[[2]]
+  final_list[, 2] <- round(as.numeric(final_list[, 2]), 4)
+  row.names(final_list) <- NULL
+  colnames(final_list) <- c("feature_name", "variable_importance")
+  final_list <- as.data.frame(final_list, stringsAsFactors=FALSE)
+  final_list[, 2] <- as.numeric(final_list[, 2])
+  final_list <- cbind(final_list, rep(".", dim(final_list)[1]),
+                     stringsAsFactors=FALSE)
+  names(final_list)[3] <- c("module_membership")
+  select_X <- names(X)[which(names(X) %in% final_list[, 1])]
+  select_mods <- module_membership[which(names(X) %in% final_list[,1])]
+  select_order <- final_list[, 1][which(final_list[,1] %in% names(X))]
+  select_mods <- select_mods[match(select_order, select_X)]
+  final_list[, 3][final_list[, 1] %in% names(X)] <- select_mods
+  final_X <- X[, names(X) %in% final_list[, 1], drop=FALSE]
+  if(!is.null(Z)) {
+    final_X <- cbind(final_X, Z[, names(Z) %in% final_list[, 1], drop=FALSE],
+                     stringsAsFactors=FALSE)
+  }
+  current_p <- dim(final_X)[2]
+  if(CLASSIFICATION == TRUE) {
+    final_mtry <- min(ceiling(select_control$mtry_factor*current_p/3),
+                      current_p)
+  }
+  if(CLASSIFICATION == FALSE) {
+    final_mtry <- min(ceiling(select_control$mtry_factor*current_p),
+                      current_p)
+  }
+  final_rf <- randomForest(x=final_X, y=y, mtry=final_mtry, ntree=final_ntree,
+                           importance=TRUE, nodesize=nodesize)
+  module_membership <- as.data.frame(cbind(names(X), module_membership),
+                                     stringsAsFactors=FALSE)
+  names(module_membership) <- c("feature_name", "module")
+  out <- fuzzy_forest(final_list, final_rf, module_membership,
+                      survivor_list=survivor_list, selection_list=selection_list)
+
+  return(out)
+}
+
+
+#' Fits WGCNA based fuzzy forest algorithm.
+#'
+#' Fits fuzzy forest algorithm using WGCNA.  Returns
+#' fuzzy forest object.
+#' @export
+#' @param X                 A data.frame.
+#'                          Each column corresponds to a feature vectors.
+#' @param y                 Response vector.  For classification, y should be a
+#'                          factor or a character.  For regression, y should be
+#'                          numeric.
+#' @param Z                 Additional features that are not to be screened out
+#'                          at the screening step.  WGCNA is not carried out on
+#'                          features in Z.
+#' @param WGCNA_params      Parameters for WGCNA.
+#'                          See \code{\link[WGCNA]{blockwiseModules}} and
+#'                          \code{\link[fuzzyforest]{WGCNA_control}} for details.
+#'                          \code{WGCNA_params} is an object of type
+#'                          \code{WGCNA_control}.
+#' @param screen_params     Parameters for screening step of fuzzy forests.
+#'                          See \code{\link[fuzzyforest]{screen_control}} for details.
+#'                          \code{screen_params} is an object of type
+#'                          \code{screen_control}.
+#' @param select_params     Parameters for selection step of fuzzy forests.
+#'                          See \code{\link[fuzzyforest]{select_control}} for details.
+#'                          \code{select_params} is an object of type
+#'                          \code{select_control}.
+#' @param final_ntree       Number trees grown in the final random forest.
+#'                          This random forest contains all selected features.
+#' @param num_processors    Number of processors used to fit random forests.
+#' @param nodesize          Minimum terminal nodesize. 1 if classification.
+#'                          5 if regression.  If the sample size is very large,
+#'                          the trees will be grown extremely deep.
+#'                          This may lead to issues with memory usage and may
+#'                          lead to significant increases in the time it takes
+#'                          the algorithm to run.  In this case,
+#'                          it may be useful to increase \code{nodesize}.
+#' @return An object of type \code{\link[fuzzyforest]{fuzzy_forest}}.  This
+#' object is a list containing useful output of fuzzy forests.
+#' It particular it contains a data.frame with list of selected features.
+#' It also includes the random forest fit using the selected features.
+#'
+#' @note This work was partially funded by NSF IIS 1251151.
+wff <- function(X, y, Z=NULL, WGCNA_params=WGCNA_control(p=6),
+                        screen_params=screen_control(min_ntree=5000),
+                        select_params=select_control(min_ntree=5000),
+                        final_ntree=500, num_processors=1, nodesize) {
+  #browser()
+  CLASSIFICATION <- is.factor(y)
+  if(CLASSIFICATION == TRUE) {
+    if(missing(nodesize)){
+      nodesize <- 1
+    }
+  }
+  if(CLASSIFICATION == FALSE) {
+    if(missing(nodesize)){
+      nodesize <- 5
+    }
+  }
+  WGCNA_control <- WGCNA_params
+  screen_control <- screen_params
+  select_control <-  select_params
+  WGCNA_args <- list(X,WGCNA_control$power)
+  WGCNA_args <- c(WGCNA_args, WGCNA_control$extra_args)
+  names(WGCNA_args) <- c("datExpr", "power", names(WGCNA_control$extra_args))
+  bwise <- do.call("blockwiseModules", WGCNA_args)
+  module_membership <- bwise$colors
+  screen_drop_fraction <- screen_control$drop_fraction
+  screen_keep_fraction <- screen_control$keep_fraction
+  screen_mtry_factor <- screen_control$mtry_factor
+  screen_ntree_factor <- screen_control$ntree_factor
+  screen_min_ntree <- screen_control$min_ntree
+  out <- ff(X, y, Z, module_membership,
+                    screen_control, select_control, final_ntree,
+                    num_processors, nodesize=nodesize)
+  out$WGCNA_object <- bwise
+  return(out)
+}
+
+
+
+
+
+

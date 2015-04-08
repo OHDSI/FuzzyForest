@@ -1,0 +1,19 @@
+Package: fuzzyforest
+Title: Fuzzy Forests
+Version: 0.0.0.9000
+Authors@R: c( person("Daniel", "Conn", role=c("aut", "cre"), email="djconn17@gmail.com"),
+              person(c("Christina M."), "Ramirez", role="aut"),
+              person("Tuck", "Ngun", role="aut"))
+Description: Fuzzy forests is a new algorithm for high dimensional
+    classification and regression in the presence of correlated features.
+Depends:
+    R (>= 3.1.1)
+License: GPL-3
+LazyData: true
+Imports:
+    randomForest,
+    WGCNA,
+    foreach,
+    doParallel,
+    parallel,
+    ggplot2
