@@ -12,10 +12,9 @@ License: GPL-3
 LazyData: true
 Imports:
     randomForest,
-    WGCNA,
     foreach,
     doParallel,
     parallel,
     ggplot2,
-    impute,
-    preprocessCore
+Suggests:
+    WGCNA
