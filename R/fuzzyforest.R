@@ -6,7 +6,6 @@
 #'
 #' @docType package
 #' @import randomForest
-#' @import WGCNA
 #' @import foreach
 #' @import doParallel
 #' @import ggplot2
