@@ -215,6 +215,10 @@ wff <- function(X, y, Z=NULL, WGCNA_params=WGCNA_control(p=6),
                         select_params=select_control(min_ntree=5000),
                         final_ntree=500, num_processors=1, nodesize) {
   #browser()
+  if ( !("package:WGCNA" %in% search()) ) {
+    stop("WGCNA must be loaded and attached. Type library(WGCNA) to do so.",
+      call. = FALSE)
+  }
   CLASSIFICATION <- is.factor(y)
   if(CLASSIFICATION == TRUE) {
     if(missing(nodesize)){
