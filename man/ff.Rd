@@ -48,7 +48,7 @@ it may be useful to increase \code{nodesize}.}
 \value{
 An object of type \code{\link[fuzzyforest]{fuzzy_forest}}.  This
 object is a list containing useful output of fuzzy forests.
-It particular it contains a data.frame with list of selected features.
+In particular it contains a data.frame with list of selected features.
 It also includes the random forest fit using the selected features.
 }
 \description{
