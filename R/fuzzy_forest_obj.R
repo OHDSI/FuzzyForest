@@ -54,7 +54,7 @@ print.fuzzy_forest <- function(x, ...) {
 #' @return A vector of predictions
 #' @note This work was partially funded by NSF IIS 1251151.
 predict.fuzzy_forest <- function(object, new_data, ...) {
-  out <- predict(fuzzy_forest$final_rf, new_data)
+  out <- predict(object$final_rf, new_data)
   return(out)
 }
 

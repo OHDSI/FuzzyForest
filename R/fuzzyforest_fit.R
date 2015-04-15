@@ -8,8 +8,8 @@
 #' @param y                 Response vector.  For classification, y should be a
 #'                          factor or a character.  For regression, y should be
 #'                          numeric.
-#' @param Z                 Additional features that are not to be screened out
-#'                          at the screening step.
+#' @param Z                 A data.frame. Additional features that are not to be
+#'                          screened out at the screening step.
 #' @param module_membership A vector giving module membership of each feature.
 #' @param screen_params     Parameters for screening step of fuzzy forests.
 #'                          See \code{\link[fuzzyforest]{screen_control}} for details.
@@ -31,7 +31,7 @@
 #'                          it may be useful to increase \code{nodesize}.
 #' @return An object of type \code{\link[fuzzyforest]{fuzzy_forest}}.  This
 #' object is a list containing useful output of fuzzy forests.
-#' It particular it contains a data.frame with list of selected features.
+#' In particular it contains a data.frame with list of selected features.
 #' It also includes the random forest fit using the selected features.
 #' @note This work was partially funded by NSF IIS 1251151.
 ff <- function(X, y, Z=NULL, module_membership,
@@ -39,6 +39,10 @@ ff <- function(X, y, Z=NULL, module_membership,
                         select_params = select_control(min_ntree=5000),
                         final_ntree = 500,
                         num_processors=1, nodesize) {
+  if (!is.data.frame(Z)) {
+    stop("Z must be a data.frame.",
+         call. = FALSE)
+  }
   CLASSIFICATION <- is.factor(y)
   screen_control <- screen_params
   select_control <-  select_params
@@ -59,7 +63,7 @@ ff <- function(X, y, Z=NULL, module_membership,
   }
 
   for (i in 1:length(module_list)) {
-    module <- X[, which(module_membership == module_list[i])]
+    module <- X[, which(module_membership == module_list[i]), drop=FALSE]
     num_features <- ncol(module)
     #TUNING PARAMETER mtry_factor
     if(CLASSIFICATION == TRUE) {
@@ -206,7 +210,7 @@ ff <- function(X, y, Z=NULL, module_membership,
 #'                          it may be useful to increase \code{nodesize}.
 #' @return An object of type \code{\link[fuzzyforest]{fuzzy_forest}}.  This
 #' object is a list containing useful output of fuzzy forests.
-#' It particular it contains a data.frame with list of selected features.
+#' In particular it contains a data.frame with list of selected features.
 #' It also includes the random forest fit using the selected features.
 #'
 #' @note This work was partially funded by NSF IIS 1251151.
