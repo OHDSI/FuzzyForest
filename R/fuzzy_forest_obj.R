@@ -40,6 +40,14 @@ fuzzy_forest <- function(feature_list, final_rf, module_membership,
 #' @note This work was partially funded by NSF IIS 1251151.
 print.fuzzy_forest <- function(x, ...) {
   print(x$feature_list)
+  if(!is.null(x$final_rf$test)) {
+    if(!is.null(x$final_rf$test$mse)) {
+      cat(c("test set error: ", x$final_rf$test$mse[x$final_rf$ntree]))
+    }
+    if(!is.null(x$final_rf$test$err.rate)) {
+      cat(c("test set error: ", x$final_rf$test$err.rate[x$final_rf$ntree]))
+    }
+  }
 }
 
 #' Predict method for fuzzy_forest object.
