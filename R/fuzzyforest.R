@@ -9,5 +9,5 @@
 #' @import foreach
 #' @import doParallel
 #' @import ggplot2
-#' @name fuzzyforests
+#' @name fuzzyforest
 NULL
