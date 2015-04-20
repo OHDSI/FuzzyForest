@@ -41,12 +41,14 @@
 ff <- function(X, y, Z=NULL, module_membership,
                         screen_params = screen_control(min_ntree=5000),
                         select_params = select_control(min_ntree=5000),
-                        final_ntree = 500,
+                        final_ntree = 5000,
                         num_processors=1, nodesize, test_features=NULL,
                         test_y=NULL) {
-  if (!is.data.frame(Z)) {
-    stop("Z must be a data.frame.",
-         call. = FALSE)
+  if(!is.null(Z)) {
+    if (!is.data.frame(Z)) {
+      stop("Z must be a data.frame.",
+           call. = FALSE)
+    }
   }
   CLASSIFICATION <- is.factor(y)
   screen_control <- screen_params

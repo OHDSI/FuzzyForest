@@ -158,7 +158,6 @@ modplot <- function(object, main=NULL, xlab=NULL, ylab=NULL,
     plot(p_module_dist)
 }
 
-
 #' Relabel modules.
 #'
 #' Lets user easily re-label modules.  Modules are often labeled according to
