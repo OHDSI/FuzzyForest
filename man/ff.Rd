@@ -7,7 +7,7 @@
 ff(X, y, Z = NULL, module_membership,
   screen_params = screen_control(min_ntree = 5000),
   select_params = select_control(min_ntree = 5000), final_ntree = 500,
-  num_processors = 1, nodesize)
+  num_processors = 1, nodesize, test_features = NULL, test_y = NULL)
 }
 \arguments{
 \item{X}{A data.frame.
@@ -17,14 +17,14 @@ Each column corresponds to a feature vectors.}
 factor or a character.  For regression, y should be
 numeric.}
 
-\item{Z}{Additional features that are not to be screened out
-at the screening step.}
+\item{Z}{A data.frame. Additional features that are not to be
+screened out at the screening step.}
 
 \item{module_membership}{A vector giving module membership of each feature.}
 
 \item{screen_params}{Parameters for screening step of fuzzy forests.
-See \code{\link[fuzzyforest]{screen_control}} for details.
-\code{screen_params} is an object of type
+See \code{\link[fuzzyforest]{screen_control}} for
+details. \code{screen_params} is an object of type
 \code{screen_control}.}
 
 \item{select_params}{Parameters for selection step of fuzzy forests.
@@ -44,11 +44,17 @@ This may lead to issues with memory usage and may
 lead to significant increases in the time it takes
 the algorithm to run.  In this case,
 it may be useful to increase \code{nodesize}.}
+
+\item{test_features}{A data.frame containing features from a test set.
+The data.frame should contain the features in both
+X and Z.}
+
+\item{test_y}{The responses for the test set.}
 }
 \value{
 An object of type \code{\link[fuzzyforest]{fuzzy_forest}}.  This
 object is a list containing useful output of fuzzy forests.
-It particular it contains a data.frame with list of selected features.
+In particular it contains a data.frame with list of selected features.
 It also includes the random forest fit using the selected features.
 }
 \description{

@@ -40,6 +40,14 @@ fuzzy_forest <- function(feature_list, final_rf, module_membership,
 #' @note This work was partially funded by NSF IIS 1251151.
 print.fuzzy_forest <- function(x, ...) {
   print(x$feature_list)
+  if(!is.null(x$final_rf$test)) {
+    if(!is.null(x$final_rf$test$mse)) {
+      cat(c("test set error: ", x$final_rf$test$mse[x$final_rf$ntree]))
+    }
+    if(!is.null(x$final_rf$test$err.rate)) {
+      cat(c("test set error: ", x$final_rf$test$err.rate[x$final_rf$ntree]))
+    }
+  }
 }
 
 #' Predict method for fuzzy_forest object.
@@ -54,7 +62,7 @@ print.fuzzy_forest <- function(x, ...) {
 #' @return A vector of predictions
 #' @note This work was partially funded by NSF IIS 1251151.
 predict.fuzzy_forest <- function(object, new_data, ...) {
-  out <- predict(fuzzy_forest$final_rf, new_data)
+  out <- predict(object$final_rf, new_data)
   return(out)
 }
 
@@ -149,7 +157,6 @@ modplot <- function(object, main=NULL, xlab=NULL, ylab=NULL,
     scale_y_continuous(expand=c(0,0))
     plot(p_module_dist)
 }
-
 
 #' Relabel modules.
 #'

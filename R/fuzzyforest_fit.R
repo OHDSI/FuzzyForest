@@ -8,12 +8,12 @@
 #' @param y                 Response vector.  For classification, y should be a
 #'                          factor or a character.  For regression, y should be
 #'                          numeric.
-#' @param Z                 Additional features that are not to be screened out
-#'                          at the screening step.
+#' @param Z                 A data.frame. Additional features that are not to be
+#'                          screened out at the screening step.
 #' @param module_membership A vector giving module membership of each feature.
 #' @param screen_params     Parameters for screening step of fuzzy forests.
-#'                          See \code{\link[fuzzyforest]{screen_control}} for details.
-#'                          \code{screen_params} is an object of type
+#'                          See \code{\link[fuzzyforest]{screen_control}} for
+#'                          details. \code{screen_params} is an object of type
 #'                          \code{screen_control}.
 #' @param select_params     Parameters for selection step of fuzzy forests.
 #'                          See \code{\link[fuzzyforest]{select_control}} for details.
@@ -29,16 +29,27 @@
 #'                          lead to significant increases in the time it takes
 #'                          the algorithm to run.  In this case,
 #'                          it may be useful to increase \code{nodesize}.
+#' @param test_features     A data.frame containing features from a test set.
+#'                          The data.frame should contain the features in both
+#'                          X and Z.
+#' @param test_y            The responses for the test set.
 #' @return An object of type \code{\link[fuzzyforest]{fuzzy_forest}}.  This
 #' object is a list containing useful output of fuzzy forests.
-#' It particular it contains a data.frame with list of selected features.
+#' In particular it contains a data.frame with list of selected features.
 #' It also includes the random forest fit using the selected features.
 #' @note This work was partially funded by NSF IIS 1251151.
 ff <- function(X, y, Z=NULL, module_membership,
                         screen_params = screen_control(min_ntree=5000),
                         select_params = select_control(min_ntree=5000),
-                        final_ntree = 500,
-                        num_processors=1, nodesize) {
+                        final_ntree = 5000,
+                        num_processors=1, nodesize, test_features=NULL,
+                        test_y=NULL) {
+  if(!is.null(Z)) {
+    if (!is.data.frame(Z)) {
+      stop("Z must be a data.frame.",
+           call. = FALSE)
+    }
+  }
   CLASSIFICATION <- is.factor(y)
   screen_control <- screen_params
   select_control <-  select_params
@@ -59,7 +70,7 @@ ff <- function(X, y, Z=NULL, module_membership,
   }
 
   for (i in 1:length(module_list)) {
-    module <- X[, which(module_membership == module_list[i])]
+    module <- X[, which(module_membership == module_list[i]), drop=FALSE]
     num_features <- ncol(module)
     #TUNING PARAMETER mtry_factor
     if(CLASSIFICATION == TRUE) {
@@ -156,14 +167,19 @@ ff <- function(X, y, Z=NULL, module_membership,
     final_mtry <- min(ceiling(select_control$mtry_factor*current_p),
                       current_p)
   }
+  if(!is.null(test_features)) {
+    test_features <- test_features[, which(names(test_features) %in%
+                                      names(final_X))]
+  }
   final_rf <- randomForest(x=final_X, y=y, mtry=final_mtry, ntree=final_ntree,
-                           importance=TRUE, nodesize=nodesize)
+                           importance=TRUE, nodesize=nodesize,
+                           xtest=test_features, ytest=test_y)
   module_membership <- as.data.frame(cbind(names(X), module_membership),
                                      stringsAsFactors=FALSE)
   names(module_membership) <- c("feature_name", "module")
   out <- fuzzy_forest(final_list, final_rf, module_membership,
-                      survivor_list=survivor_list, selection_list=selection_list)
-
+                      survivor_list=survivor_list,
+                      selection_list=selection_list)
   return(out)
 }
 
@@ -204,17 +220,25 @@ ff <- function(X, y, Z=NULL, module_membership,
 #'                          lead to significant increases in the time it takes
 #'                          the algorithm to run.  In this case,
 #'                          it may be useful to increase \code{nodesize}.
+#' @param test_features     A data.frame containing features from a test set.
+#'                          The data.frame should contain the features in both
+#'                          X and Z.
+#' @param test_y            The responses for the test set.
 #' @return An object of type \code{\link[fuzzyforest]{fuzzy_forest}}.  This
 #' object is a list containing useful output of fuzzy forests.
-#' It particular it contains a data.frame with list of selected features.
+#' In particular it contains a data.frame with list of selected features.
 #' It also includes the random forest fit using the selected features.
-#'
 #' @note This work was partially funded by NSF IIS 1251151.
 wff <- function(X, y, Z=NULL, WGCNA_params=WGCNA_control(p=6),
                         screen_params=screen_control(min_ntree=5000),
                         select_params=select_control(min_ntree=5000),
-                        final_ntree=500, num_processors=1, nodesize) {
+                        final_ntree=500, num_processors=1, nodesize,
+                        test_features=NULL, test_y=NULL) {
   #browser()
+  if ( !("package:WGCNA" %in% search()) ) {
+    stop("WGCNA must be loaded and attached. Type library(WGCNA) to do so.",
+      call. = FALSE)
+  }
   CLASSIFICATION <- is.factor(y)
   if(CLASSIFICATION == TRUE) {
     if(missing(nodesize)){
@@ -241,7 +265,8 @@ wff <- function(X, y, Z=NULL, WGCNA_params=WGCNA_control(p=6),
   screen_min_ntree <- screen_control$min_ntree
   out <- ff(X, y, Z, module_membership,
                     screen_control, select_control, final_ntree,
-                    num_processors, nodesize=nodesize)
+                    num_processors, nodesize=nodesize,
+                    test_features=test_features, test_y=test_y)
   out$WGCNA_object <- bwise
   return(out)
 }

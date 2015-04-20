@@ -6,9 +6,8 @@
 #'
 #' @docType package
 #' @import randomForest
-#' @import WGCNA
 #' @import foreach
 #' @import doParallel
 #' @import ggplot2
-#' @name fuzzyforests
+#' @name fuzzyforest
 NULL

@@ -7,7 +7,7 @@
 wff(X, y, Z = NULL, WGCNA_params = WGCNA_control(p = 6),
   screen_params = screen_control(min_ntree = 5000),
   select_params = select_control(min_ntree = 5000), final_ntree = 500,
-  num_processors = 1, nodesize)
+  num_processors = 1, nodesize, test_features = NULL, test_y = NULL)
 }
 \arguments{
 \item{X}{A data.frame.
@@ -49,11 +49,17 @@ This may lead to issues with memory usage and may
 lead to significant increases in the time it takes
 the algorithm to run.  In this case,
 it may be useful to increase \code{nodesize}.}
+
+\item{test_features}{A data.frame containing features from a test set.
+The data.frame should contain the features in both
+X and Z.}
+
+\item{test_y}{The responses for the test set.}
 }
 \value{
 An object of type \code{\link[fuzzyforest]{fuzzy_forest}}.  This
 object is a list containing useful output of fuzzy forests.
-It particular it contains a data.frame with list of selected features.
+In particular it contains a data.frame with list of selected features.
 It also includes the random forest fit using the selected features.
 }
 \description{
