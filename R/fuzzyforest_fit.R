@@ -50,6 +50,9 @@ ff <- function(X, y, Z=NULL, module_membership,
            call. = FALSE)
     }
   }
+  if(!is.data.frame(X)) {
+    stop("X must be a data.frame.", call. = FALSE)
+  }
   CLASSIFICATION <- is.factor(y)
   screen_control <- screen_params
   select_control <-  select_params
@@ -189,8 +192,11 @@ ff <- function(X, y, Z=NULL, module_membership,
 #' Fits fuzzy forest algorithm using WGCNA.  Returns
 #' fuzzy forest object.
 #' @export
-#' @param X                 A data.frame.
-#'                          Each column corresponds to a feature vectors.
+#' @param X                 A data.frame. Each column corresponds to a feature
+#'                          vector.  WGCNA will be used to cluster the
+#'                          features in X.  As a result, the features should be
+#'                          all be numeric.  Non-numeric features may be input
+#'                          via Z.
 #' @param y                 Response vector.  For classification, y should be a
 #'                          factor or a character.  For regression, y should be
 #'                          numeric.
