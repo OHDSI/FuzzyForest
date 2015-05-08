@@ -245,6 +245,15 @@ wff <- function(X, y, Z=NULL, WGCNA_params=WGCNA_control(p=6),
     stop("WGCNA must be loaded and attached. Type library(WGCNA) to do so.",
       call. = FALSE)
   }
+  integer_test <- sapply(X, is.integer)
+  if( sum(integer_test) > 0 ) {
+    ints <- which(integer_test == TRUE)
+    X[, ints] <- as.numeric(X[, ints])
+  }
+  numeric_test <- sapply(X, is.numeric)
+  if (sum(numeric_test) != dim(X)[2]) {
+    stop("The columns of X must be numeric.")
+  }
   CLASSIFICATION <- is.factor(y)
   if(CLASSIFICATION == TRUE) {
     if(missing(nodesize)){
