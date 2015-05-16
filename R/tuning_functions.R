@@ -5,7 +5,6 @@
 #' value of mtry with minimum mse.
 #'
 #'
-#' @export
 #' @param object            An object of type fuzzy_forest.
 #' @param step_size         By default, mtry starts out high (equal to the
 #'                          number of features selected) and goes down by

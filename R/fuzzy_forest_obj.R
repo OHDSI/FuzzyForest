@@ -162,7 +162,6 @@ modplot <- function(object, main=NULL, xlab=NULL, ylab=NULL,
 #'
 #' Lets user easily re-label modules.  Modules are often labeled according to
 #' color in WGCNA.  This function allows the user to rename the modules.
-#' @export
 #' @param object        An object of type fuzzy_forest.
 #' @param module_labels Labels for the modules.  A data.frame
 #'                      or character matrix with first column giving
