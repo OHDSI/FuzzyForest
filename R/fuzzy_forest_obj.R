@@ -123,6 +123,10 @@ modplot <- function(object, main=NULL, xlab=NULL, ylab=NULL,
   df = rbind(df
              , us_modules
   )
+  num_test <- is.numeric(unique(object$WGCNA_object$colors))
+  if(num_test==TRUE){
+    levels(df[,1]) <- as.character(sort(as.numeric(levels(df[,1]))))
+  }
   module=5
   percent=5
   type=5

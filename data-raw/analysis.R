@@ -173,9 +173,9 @@ select_params <- select_control(drop_fraction=drop_fraction,
 # 18          18          17          17          16
 # MMT00047424 MMT00054175 MMT00063552 MMT00023352 MMT00060205
 # 16          16          16          15          15
-load("X_impute.RData")
-y <- X_impute[, 1]
-X <- X_impute[, -1]
+load("Liver_Expr.RData")
+y <- Liver_Expr[, 1]
+X <- Liver_Expr[, -1]
 n <- dim(X)[1]
 p <- dim(X)[2]
 test_ind <- sample(1:n, ceiling(n/3), replace=TRUE)
@@ -185,7 +185,7 @@ X_train <- X[-test_ind, ]
 y_train <- y[-test_ind]
 WGCNA_params <- WGCNA_control(p=6, minModuleSize=30, TOMType = "unsigned",
                               reassignThreshold = 0, mergeCutHeight = 0.25,
-                              numericLabels = FALSE, pamRespectsDendro = FALSE)
+                              numericLabels = TRUE, pamRespectsDendro = FALSE)
 mtry_factor <- 5; drop_fraction <- .25; number_selected <- 30
 keep_fraction <- .1; min_ntree <- 5000; ntree_factor <- 5
 final_ntree <- 25000;
