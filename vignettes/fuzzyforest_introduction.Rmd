@@ -1,0 +1,206 @@
+---
+title: "Introduction to the `fuzzyforest` Package"
+author: "Daniel Conn"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{ff_introduction}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+Fuzzy forests is an extension of random forests designed to yield less biased
+variable rankings when the variables are correlated.
+In this vignette we introduce the basic capabilities of the `fuzzyforest` package.
+We demonstrate two methods of fitting fuzzy forests.  The first method allows
+the user to pre-specify how features should be grouped prior to application
+of fuzzy forests.  This method uses the `ff` function.  
+
+`fuzzyforest` also supports automatic application of WGCNA.  In other words, 
+WGCNA is used to partition the covariates into distinct clusters.  Fuzzy forests
+is then applied using this partition.  The `wff` automatically carries out
+WGCNA before running fuzzy forests.
+
+We analyze a subset of the liver expression data for female mice from the 
+[WGCNA tutorial](http://labs.genetics.ucla.edu/horvath/CoexpressionNetwork/Rpackages/WGCNA/Tutorials/).  The dependent variable is weight (g), the dependent variables
+record expression levels for 3,600 different genes. We used `rfImpute` from the package randomForest, to impute missing expression levels for certain genes.  For the
+raw data and further information about the data see the tutorial: [WGCNA tutorial](http://labs.genetics.ucla.edu/horvath/CoexpressionNetwork/Rpackages/WGCNA/Tutorials/). 
+
+## Installing WGCNA
+In order to use WGCNA with `fuzzyforest`, packages from bioconductor must be installed. To install these packages, type the following command into the R console:
+```{r eval=FALSE}
+setRepositories(ind=1:2)  
+install.packages("WGCNA")
+```
+
+## Attaching Required Packages
+In general, the packages `WGCNA` and `randomForest` must be attached to take full advantage of `fuzzyforest`'s
+functionality.  
+```{r message=FALSE, results='hide'}
+library(WGCNA)
+library(randomForest)
+library(fuzzyforest)
+library(foreach)
+```
+
+## A Brief WGCNA Analysis
+```{r, warning=FALSE, results='hide',fig.show='hold', cache=FALSE}
+#set seed so that results are reproducible
+set.seed(1679)
+
+weight <- Liver_Expr[, 1]
+expression_levels <- Liver_Expr[, -1]
+# Choose a set of soft-thresholding powers
+powers = c(c(1:10), seq(from = 12, to=20, by=2))
+# Call the network topology analysis function
+sft = pickSoftThreshold(expression_levels, powerVector = powers, verbose = 0)
+# Plot the results:
+cex1 = 0.9;
+# Scale-free topology fit index as a function of the soft-thresholding power
+plot(sft$fitIndices[,1], -sign(sft$fitIndices[,3])*sft$fitIndices[,2],
+     xlab="Soft Threshold (power)",ylab="Scale Free Topology Model Fit,signed R^2",type="n",
+     main = paste("Scale independence"));
+text(sft$fitIndices[,1], -sign(sft$fitIndices[,3])*sft$fitIndices[,2],
+     labels=powers,cex=cex1,col="red");
+# this line corresponds to using an R^2 cut-off of h
+abline(h=0.90,col="red")
+#Mean connectivity as a function of the soft-thresholding power
+plot(sft$fitIndices[,1], sft$fitIndices[,5],
+     xlab="Soft Threshold (power)",ylab="Mean Connectivity", type="n",
+     main = paste("Mean connectivity"))
+text(sft$fitIndices[,1], sft$fitIndices[,5], labels=powers, cex=cex1,col="red")
+```
+
+The above plots suggest that the $p=7$ is the smallest
+power such that the scale-free topology criterion is approximately met. We carry out WGCNA with $p=7$.
+
+```{r, warning=FALSE, results='hide',fig.show='hold', cache=FALSE}
+net = blockwiseModules(expression_levels, power = 7,
+                       TOMType = "unsigned", minModuleSize = 30,
+                       reassignThreshold = 0, mergeCutHeight = 0.25,
+                       numericLabels = TRUE, pamRespectsDendro = FALSE,
+                       verbose = 0)
+```
+            
+#Fuzzy Forests            
+We may then use fuzzy forests to select important features.
+We first extract the module membership of each feature.
+```{r, warning=FALSE, results='hide',fig.show='hold'}
+module_membership <- net$colors
+```
+
+We then set up values for various tuning parameters.
+Fuzzy forests first screens out unimportant features from each module
+via recursive feature elimination. Then it selects the top $k$ features
+where $k$ is prespecified by the user.  `screening_params` contains tuning
+parameters pertaining to the elimination of features within modules.
+`select_params` contains tuning parameters pertaining to the elimination
+of features surviving this initial screening step.
+
+```{r, warning=FALSE, results='hide',fig.show='hold'}
+mtry_factor <- 1; drop_fraction <- .25; number_selected <- 10
+keep_fraction <- .1; min_ntree <- 5000; ntree_factor <- 5
+final_ntree <- 25000;
+screen_params <- screen_control(drop_fraction=drop_fraction,
+                                keep_fraction=keep_fraction,
+                                min_ntree=min_ntree, mtry_factor=mtry_factor,
+                                ntree_factor=ntree_factor)
+select_params <- select_control(drop_fraction=drop_fraction,
+                                number_selected=number_selected,
+                                min_ntree=min_ntree, mtry_factor=mtry_factor,
+                                ntree_factor=ntree_factor)
+```
+### Tips for Setting Tuning Parameters
+* `mtry_factor`: Fuzzy forests uses random forest recursive feature elimination 
+to eliminate unimportant features.  For each of these random forests, a value of
+`mtry` must be selected.  Letting $p'$, be the number of covariates  in the
+current random forest, `mtry` is approximately `mtry_factor`$\sqrt p'$  (more
+precisely, `mtry`=min(ceiling(`mtry_factor`$\sqrt p'$, $p'$))). Similarly, for
+classification, `mtry` is approximately `mtry_factor`$(p'/3)$. Higher values of
+`mtry` generally allow the algorithm to zone in on  the most important features
+at the risk of overfitting.  Selecting a lower value of `mtry` reduces the
+chances of overfitting, but increases the chances that an important feature is
+overlooked.   
+* `ntree_factor` and `min_ntree`: For each of these random forests, the number
+of trees also depends on the current number of features $p'$. If the number of
+covariates is large, more trees must be grown.  The number of trees grown for
+each tree is approximately max(`min_ntree`, `ntree_factor`$*p'$).  In general,
+growing more trees is better (no risk of overfitting), however, if too many
+trees are grown fuzzy forests will take a very long to run.
+* `drop_fraction`: After each random forest, the features with the lowest
+variable importance ranking are dropped.  The number of features dropped
+at each such step, is equal to ceiling(`drop_fraction`$p`$).  Lower values
+of `drop_fraction` lead to more aggressive model selection and higher running
+time.
+* `keep_fraction` and `number_selected`: `keep_fraction` is the percentage
+of features from each module that are retained during the screening step
+of fuzzy forests.  `number_selected` is the final number of features 
+selected by fuzzy forests.
+* `final_ntree`: After the important features have been selected, 
+a final random forest is fit using these selected features.  `final_ntree` is the number of trees grown in this random forest.
+Fuzzy forests is then fit using the function ``ff``:
+
+```{r, warning=FALSE, results='hide',fig.show='hold', cache=FALSE}
+ff_fit <- ff(expression_levels, weight, module_membership=module_membership,
+            screen_params=screen_params, select_params=select_params,
+            final_ntree=final_ntree)
+```
+
+Likewise, fuzzy forests may also be fit `wff` function.  Ideally, tuning parameters for WGCNA should be selected with care.  Ideally, the resulting modules should be scientifically meaningful. For convenience and to make it easier to get started using fuzzy forests, `wff` automatically carries out 
+WGCNA.  Parameters for WGCNA are input through the object `WGCNA_params`
+
+```{r, warning=FALSE, results='hide',fig.show='hold', cache=FALSE, eval=FALSE}
+WGCNA_params <- WGCNA_control(p=7, minModuleSize=30, TOMType = "unsigned",
+                              reassignThreshold = 0, mergeCutHeight = 0.25,
+                              numericLabels = TRUE, pamRespectsDendro = FALSE)
+wff_fit <- wff(expression_levels,weight, WGCNA_params=WGCNA_params,
+              screen_params=screen_params,
+              select_params=select_params,
+              final_ntree=final_ntree,
+              num_processors=1)
+```
+
+`wff` and `ff` both return objects of type `fuzzy_forest`, a list containing
+the results of fuzzy forests.  A list of the top $k$ features is returned in
+a `data.frame` via the following call:
+
+```{r, warning=FALSE, fig.show='hold'}
+rankings <- ff_fit$feature_list
+rankings
+```
+
+A random forest obtained using the selected features is obtained by the
+following command. This random forest is used to obtain predictions for new
+data.  Note that the mse reported reported below is overly optimistic.  For classification, the reported error rates will also be overly optimistic.
+The recursive feature elimination biases the standard out of bag error rate. 
+```{r, warning=FALSE, fig.show='hold'}
+final_rf <- ff_fit$final_rf
+final_rf_mse <- tail(final_rf$mse, 1)
+```
+```{r, warning=FALSE, results='hold', echo=FALSE, fig.show='hold'}
+cat(" warning!", "\n", "biased estimate of the mse:", final_rf_mse)
+```
+
+The function `modplot` may be applied to objects of type `fuzzy_forest` to 
+obtain a graph depicting which modules are over-represented in the list of the 
+most important features.  In this case, module 1 appears to be highly 
+over-represented.
+
+```{r, warning=FALSE, results='hide',fig.show='hold',fig.width=11, fig.height=9}
+modplot(ff_fit)
+```
+
+or
+
+```{r, warning=FALSE, results='hide',fig.show='hide', eval=FALSE}
+modplot(wff_fit)
+```
+
+The variable importances of the selected features can be graphically 
+displayed by using the function `varImpPlot` from the package `randomForest`.
+We first access the final random forest.
+
+```{r, warning=FALSE, results='hide',fig.show='hold',fig.width=11,fig.height=9}
+varImpPlot(final_rf)
+```
+
+

@@ -6,15 +6,17 @@ Authors@R: c( person("Daniel", "Conn", role=c("aut", "cre"), email="djconn17@gma
               person("Tuck", "Ngun", role="aut"))
 Description: Fuzzy forests is a new algorithm for high dimensional
     classification and regression in the presence of correlated features.
-Depends:
+Depends: 
     R (>= 3.0.0)
 License: GPL-3
 LazyData: true
-Imports:
+Imports: 
     randomForest,
     foreach,
     doParallel,
     parallel,
     ggplot2
-Suggests:
-    WGCNA
+Suggests: 
+    WGCNA,
+    knitr
+VignetteBuilder: knitr
