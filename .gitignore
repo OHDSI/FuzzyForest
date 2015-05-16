@@ -4,3 +4,4 @@
 .DS_Store
 test.R
 src/*.dll
+inst/doc
