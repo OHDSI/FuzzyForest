@@ -123,8 +123,9 @@ modplot <- function(object, main=NULL, xlab=NULL, ylab=NULL,
   df = rbind(df
              , us_modules
   )
-  num_test <- is.numeric(unique(object$WGCNA_object$colors))
-  if(num_test==TRUE){
+  #check to see if module names are numeric, if so put them in correct order
+  num_test <- suppressWarnings(as.numeric(object$module_membership$module))
+  if(sum(is.na(num_test))==0) {
     levels(df[,1]) <- as.character(sort(as.numeric(levels(df[,1]))))
   }
   module=5
