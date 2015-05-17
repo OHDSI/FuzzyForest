@@ -5,3 +5,4 @@
 test.R
 src/*.dll
 inst/doc
+data-raw/*.R
