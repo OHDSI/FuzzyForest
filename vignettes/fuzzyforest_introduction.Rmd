@@ -9,32 +9,34 @@ vignette: >
   \usepackage[utf8]{inputenc}
 ---
 Fuzzy forests is an extension of random forests designed to yield less biased
-variable rankings when the variables are correlated.
+feature rankings when the features are correlated.
 In this vignette we introduce the basic capabilities of the `fuzzyforest` package.
 We demonstrate two methods of fitting fuzzy forests.  The first method allows
 the user to pre-specify how features should be grouped prior to application
 of fuzzy forests.  This method uses the `ff` function.  
 
-`fuzzyforest` also supports automatic application of WGCNA.  In other words, 
-WGCNA is used to partition the covariates into distinct clusters.  Fuzzy forests
-is then applied using this partition.  The `wff` automatically carries out
-WGCNA before running fuzzy forests.
+`fuzzyforest` also allows for easy integration with WGCNA via the function 
+`wff`. In one function call, WGCNA is used to partition the covariates into 
+distinct clusters and fuzzy forests is then applied using this partition.  
 
-We analyze a subset of the liver expression data for female mice from the 
-[WGCNA tutorial](http://labs.genetics.ucla.edu/horvath/CoexpressionNetwork/Rpackages/WGCNA/Tutorials/).  The dependent variable is weight (g), the dependent variables
-record expression levels for 3,600 different genes. We used `rfImpute` from the package randomForest, to impute missing expression levels for certain genes.  For the
-raw data and further information about the data see the tutorial: [WGCNA tutorial](http://labs.genetics.ucla.edu/horvath/CoexpressionNetwork/Rpackages/WGCNA/Tutorials/). 
+In this vignette we analyze a data set concerning the expression of genes in 
+liver tissue for female mice.  This is a subset of the data set used in the
+[WGCNA tutorial](http://labs.genetics.ucla.edu/horvath/CoexpressionNetwork/Rpackages/WGCNA/Tutorials/).  The data set contains 66 observations.  The dependent variable is weight (g), the independent variables
+record expression levels for 3,600 different genes. We used `rfImpute` from the
+package `randomForest`, to impute missing expression levels for certain genes.  For the full, raw data and further information about the data see the tutorial: [WGCNA tutorial](http://labs.genetics.ucla.edu/horvath/CoexpressionNetwork/Rpackages/WGCNA/Tutorials/). 
 
 ## Installing WGCNA
-In order to use WGCNA with `fuzzyforest`, packages from bioconductor must be installed. To install these packages, type the following command into the R console:
+In order to use WGCNA with `fuzzyforest`, packages from Bioconductor must be installed.
+Further information about the installation requirements for WGCNA can be found at
+the following link: http://labs.genetics.ucla.edu/horvath/CoexpressionNetwork/Rpackages/WGCNA/#manualInstall.
+To install these packages, type the following command into the R console:
 ```{r eval=FALSE}
 setRepositories(ind=1:2)  
 install.packages("WGCNA")
 ```
 
 ## Attaching Required Packages
-In general, the packages `WGCNA` and `randomForest` must be attached to take full advantage of `fuzzyforest`'s
-functionality.  
+In general, the packages `WGCNA` and `randomForest` must be attached to take full advantage of `fuzzyforest`'s functionality.  
 ```{r message=FALSE, results='hide'}
 library(WGCNA)
 library(randomForest)
@@ -72,7 +74,6 @@ text(sft$fitIndices[,1], sft$fitIndices[,5], labels=powers, cex=cex1,col="red")
 
 The above plots suggest that the $p=7$ is the smallest
 power such that the scale-free topology criterion is approximately met. We carry out WGCNA with $p=7$.
-
 ```{r, warning=FALSE, results='hide',fig.show='hold', cache=FALSE}
 net = blockwiseModules(expression_levels, power = 7,
                        TOMType = "unsigned", minModuleSize = 30,
@@ -95,11 +96,10 @@ where $k$ is prespecified by the user.  `screening_params` contains tuning
 parameters pertaining to the elimination of features within modules.
 `select_params` contains tuning parameters pertaining to the elimination
 of features surviving this initial screening step.
-
 ```{r, warning=FALSE, results='hide',fig.show='hold'}
 mtry_factor <- 1; drop_fraction <- .25; number_selected <- 10
 keep_fraction <- .1; min_ntree <- 5000; ntree_factor <- 5
-final_ntree <- 25000;
+final_ntree <- 25000; nodesize <- 1
 screen_params <- screen_control(drop_fraction=drop_fraction,
                                 keep_fraction=keep_fraction,
                                 min_ntree=min_ntree, mtry_factor=mtry_factor,
@@ -137,41 +137,47 @@ of fuzzy forests.  `number_selected` is the final number of features
 selected by fuzzy forests.
 * `final_ntree`: After the important features have been selected, 
 a final random forest is fit using these selected features.  `final_ntree` is the number of trees grown in this random forest.
-Fuzzy forests is then fit using the function ``ff``:
+* `nodesize`: This parameter controls the depth of the regression trees.  
+`nodesize` controls the minimum size of terminal nodes.  
+By default, `nodesize` is set to 1.  However, it is often advantageous to set 
+nodesize larger.  If the number of observations is large, `nodesize` often must
+be set larger than 1 for the sake computational speed or to prevent memory issues.
 
+Fuzzy forests is then fit using the function ``ff``:
 ```{r, warning=FALSE, results='hide',fig.show='hold', cache=FALSE}
-ff_fit <- ff(expression_levels, weight, module_membership=module_membership,
-            screen_params=screen_params, select_params=select_params,
-            final_ntree=final_ntree)
+ff_fit <- ff(expression_levels, weight, module_membership = module_membership,
+            screen_params = screen_params, select_params=select_params,
+            final_ntree = final_ntree, nodesize = nodesize)
 ```
 
-Likewise, fuzzy forests may also be fit `wff` function.  Ideally, tuning parameters for WGCNA should be selected with care.  Ideally, the resulting modules should be scientifically meaningful. For convenience and to make it easier to get started using fuzzy forests, `wff` automatically carries out 
+Likewise, fuzzy forests may also be fit via the `wff` function.  Ideally, tuning parameters for WGCNA should be selected with care.  Ideally, the resulting modules should be scientifically meaningful. For convenience and to make it easier to get started using fuzzy forests, `wff` automatically carries out 
 WGCNA.  Parameters for WGCNA are input through the object `WGCNA_params`
 
 ```{r, warning=FALSE, results='hide',fig.show='hold', cache=FALSE, eval=FALSE}
-WGCNA_params <- WGCNA_control(p=7, minModuleSize=30, TOMType = "unsigned",
+WGCNA_params <- WGCNA_control(p = 7, minModuleSize = 30, TOMType = "unsigned",
                               reassignThreshold = 0, mergeCutHeight = 0.25,
                               numericLabels = TRUE, pamRespectsDendro = FALSE)
-wff_fit <- wff(expression_levels,weight, WGCNA_params=WGCNA_params,
-              screen_params=screen_params,
-              select_params=select_params,
-              final_ntree=final_ntree,
-              num_processors=1)
+wff_fit <- wff(expression_levels, weight, WGCNA_params = WGCNA_params,
+              screen_params = screen_params,
+              select_params = select_params,
+              final_ntree = final_ntree,
+              num_processors = 1, nodesize = nodesize)
 ```
 
 `wff` and `ff` both return objects of type `fuzzy_forest`, a list containing
 the results of fuzzy forests.  A list of the top $k$ features is returned in
 a `data.frame` via the following call:
-
 ```{r, warning=FALSE, fig.show='hold'}
 rankings <- ff_fit$feature_list
 rankings
 ```
 
-A random forest obtained using the selected features is obtained by the
-following command. This random forest is used to obtain predictions for new
-data.  Note that the mse reported reported below is overly optimistic.  For classification, the reported error rates will also be overly optimistic.
-The recursive feature elimination biases the standard out of bag error rate. 
+After features are selected, a random forest is fit using these selected features.
+This random forest is accessed by the following command and can be used to 
+obtain predictions for new data.  Note that the mse 
+reported below is overly optimistic.  For classification, the reported 
+error rates will also be overly optimistic.
+The recursive feature elimination biases the usual out of bag error rate. 
 ```{r, warning=FALSE, fig.show='hold'}
 final_rf <- ff_fit$final_rf
 final_rf_mse <- tail(final_rf$mse, 1)
@@ -184,7 +190,6 @@ The function `modplot` may be applied to objects of type `fuzzy_forest` to
 obtain a graph depicting which modules are over-represented in the list of the 
 most important features.  In this case, module 1 appears to be highly 
 over-represented.
-
 ```{r, warning=FALSE, results='hide',fig.show='hold',fig.width=11, fig.height=9}
 modplot(ff_fit)
 ```
@@ -197,8 +202,6 @@ modplot(wff_fit)
 
 The variable importances of the selected features can be graphically 
 displayed by using the function `varImpPlot` from the package `randomForest`.
-We first access the final random forest.
-
 ```{r, warning=FALSE, results='hide',fig.show='hold',fig.width=11,fig.height=9}
 varImpPlot(final_rf)
 ```
