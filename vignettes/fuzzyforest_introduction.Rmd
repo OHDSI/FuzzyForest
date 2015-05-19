@@ -9,15 +9,19 @@ vignette: >
   \usepackage[utf8]{inputenc}
 ---
 Fuzzy forests is an extension of random forests designed to yield less biased
-feature rankings when the features are correlated.
+variable importance rankings when there is high correlation among the variables.
+For further information about fuzzy forests see the paper at the following link:
+https://github.com/daniel-conn17/FuzzyForestPaper.
 In this vignette we introduce the basic capabilities of the `fuzzyforest` package.
 We demonstrate two methods of fitting fuzzy forests.  The first method allows
 the user to pre-specify how features should be grouped prior to application
 of fuzzy forests.  This method uses the `ff` function.  
 
-`fuzzyforest` also allows for easy integration with WGCNA via the function 
+`fuzzyforest` also allows for easy integration with Weighted Gene Co-expression
+Network Analysis (WGCNA) via the function 
 `wff`. In one function call, WGCNA is used to partition the covariates into 
-distinct clusters and fuzzy forests is then applied using this partition.  
+distinct clusters such that the clusters are roughly uncorrelated with
+one another. Fuzzy forests is then applied using this partition.  
 
 In this vignette we analyze a data set concerning the expression of genes in 
 liver tissue for female mice.  This is a subset of the data set used in the
