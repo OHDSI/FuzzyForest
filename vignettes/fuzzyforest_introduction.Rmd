@@ -31,13 +31,20 @@ package `randomForest`, to impute missing expression levels for certain genes.  
 
 ## Installing WGCNA
 In order to use WGCNA with `fuzzyforest`, packages from Bioconductor must be installed.
-Further information about the installation requirements for WGCNA can be found at
-the following link: http://labs.genetics.ucla.edu/horvath/CoexpressionNetwork/Rpackages/WGCNA/#manualInstall.
 To install these packages, type the following command into the R console:
 ```{r eval=FALSE}
 setRepositories(ind=1:2)  
 install.packages("WGCNA")
 ```
+For Windows operating systems, we've experienced further issues.
+Typing the following commands has resolved these issues.
+```{r eval=FALSE}
+source("http://bioconductor.org/biocLite.R")
+biocLite("AnnotationDbi", type="source")
+biocLite("GO.db")
+```
+Further information about the installation requirements for WGCNA can be found at
+the following link: http://labs.genetics.ucla.edu/horvath/CoexpressionNetwork/Rpackages/WGCNA/#manualInstall.
 
 ## Attaching Required Packages
 In general, the packages `WGCNA` and `randomForest` must be attached to take full advantage of `fuzzyforest`'s functionality.  

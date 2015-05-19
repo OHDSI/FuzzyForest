@@ -5,6 +5,10 @@
       packageStartupMessage("setRepositories(ind=1:2)")
       packageStartupMessage("install.packages(\"WGCNA\")")
       packageStartupMessage(" ")
+      packageStartupMessage("For Windows operating system type the following:")
+      packageStartupMessage("source(\"http://bioconductor.org/biocLite.R\")")
+      packageStartupMessage("biocLite(\"AnnotationDbi\", type=\"source\")")
+      packageStartupMessage("biocLite(\"GO.db\")")
       packageStartupMessage("If this fails see http://labs.genetics.ucla.edu/horvath/CoexpressionNetwork/Rpackages/WGCNA/ \n for further information.")
     }
 }

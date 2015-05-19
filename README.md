@@ -20,7 +20,13 @@ into the console:
 setRepositories(ind=1:2)  
 install.packages("WGCNA")
 ```
-
+For Windows operating systems, we've experienced further issues.
+Typing the following commands has resolved these issues.
+```{r}
+source("http://bioconductor.org/biocLite.R")
+biocLite("AnnotationDbi", type="source")
+biocLite("GO.db")
+```
 If further issues with the installation of `WGCNA` arise see the `WGCNA`
 website: http://labs.genetics.ucla.edu/horvath/CoexpressionNetwork/Rpackages/WGCNA/index.html#manualInstall
 
