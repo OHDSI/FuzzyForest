@@ -21,7 +21,7 @@ setRepositories(ind=1:2)
 install.packages("WGCNA")
 ```
 For Windows operating systems, we've experienced further issues.
-Typing the following commands has resolved these issues.
+In addition to the previous lines of code, type the following into console:
 ```{r}
 source("http://bioconductor.org/biocLite.R")
 biocLite("AnnotationDbi", type="source")
