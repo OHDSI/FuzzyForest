@@ -24,4 +24,9 @@ controlling WGCNA will be carried out.
 \note{
 This work was partially funded by NSF IIS 1251151.
 }
+\examples{
+WGCNA_params <- WGCNA_control(p=7, minModuleSize=30, TOMType = "unsigned",
+                              reassignThreshold = 0, mergeCutHeight = 0.25,
+                              numericLabels = TRUE, pamRespectsDendro = FALSE)
+}
 

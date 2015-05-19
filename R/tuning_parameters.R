@@ -23,6 +23,17 @@
 #'                          \code{ntree_factor}*p).
 #' @param min_ntree         Minimum number of trees grown in each random forest.
 #' @return An object of type screen_control.
+#' @examples
+#' drop_fraction <- .25
+#' keep_fraction <- .1
+#' mtry_factor <- 1
+#' min_ntree <- 5000
+#' ntree_factor <- 5
+#' screen_params <- screen_control(drop_fraction=drop_fraction,
+#'                                 keep_fraction=keep_fraction,
+#'                                 mtry_factor=mtry_factor,
+#'                                 min_ntree=min_ntree,
+#'                                 ntree_factor=ntree_factor)
 #' @note This work was partially funded by NSF IIS 1251151.
 screen_control <- function(drop_fraction=.25, keep_fraction=.05,
                            mtry_factor=1, min_ntree=5000, ntree_factor=10) {
@@ -61,6 +72,17 @@ screen_control <- function(drop_fraction=.25, keep_fraction=.05,
 #'                          \code{ntree_factor}*\code{p}).
 #' @param min_ntree         Minimum number of trees grown in each random forest.
 #' @return An object of type selection_control.
+#' @examples
+#' drop_fraction <- .25
+#' number_selected <- 10
+#' mtry_factor <- 1
+#' min_ntree <- 5000
+#' ntree_factor <- 5
+#' select_params <- select_control(drop_fraction=drop_fraction,
+#'                                 number_selected=number_selected,
+#'                                 mtry_factor=mtry_factor,
+#'                                 min_ntree=min_ntree,
+#'                                 ntree_factor=ntree_factor)
 #' @note This work was partially funded by NSF IIS 1251151.
 select_control <- function(drop_fraction=.25, number_selected=5,
                               mtry_factor=1, min_ntree=5000, ntree_factor=10) {
@@ -86,6 +108,10 @@ select_control <- function(drop_fraction=.25, number_selected=5,
 #'                          See \code{\link[WGCNA]{blockwiseModules}} for
 #'                          details.
 #' @return An object of type WGCNA_control.
+#' @examples
+#' WGCNA_params <- WGCNA_control(p=7, minModuleSize=30, TOMType = "unsigned",
+#'                               reassignThreshold = 0, mergeCutHeight = 0.25,
+#'                               numericLabels = TRUE, pamRespectsDendro = FALSE)
 #' @note This work was partially funded by NSF IIS 1251151.
 WGCNA_control <- function(power=6, ...) {
   extra_args <- list(...)

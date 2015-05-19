@@ -64,4 +64,37 @@ fuzzy forest object.
 \note{
 This work was partially funded by NSF IIS 1251151.
 }
+\examples{
+#ff requires that the partition of the covariates be previously determined.
+#ff is handy if the user wants to test out multiple settings of WGCNA
+#prior to running fuzzy forests.
+library(WGCNA)
+library(randomForest)
+y <- Liver_Expr$weight
+X <- Liver_Expr[, -1]
+net = blockwiseModules(X, power = 7,
+                       TOMType = "unsigned", minModuleSize = 30,
+                       reassignThreshold = 0, mergeCutHeight = 0.25,
+                       numericLabels = TRUE, pamRespectsDendro = FALSE,
+                       verbose = 0)
+module_membership <- net$colors
+data(Liver_Expr)
+set.seed(3653)
+
+screen_params <- screen_control(min_ntree=5000, keep_fraction=.25)
+select_params <- select_control(min_ntree=5000, number_selected=10)
+ff_fit <- ff(X, y, module_membership = module_membership,
+             screen_params = screen_params,
+             select_params = select_params,
+             final_ntree = 5000)
+
+#see which features have been selected along with their variable importance
+feature_list <- ff_fit$feature_list
+
+#see which modules are over represented in terms of their importance
+modplot(ff_fit)
+
+#produce dotplot to obtain a visual representation of the variable importance measures.
+varImpPlot(ff_fit$final_rf)
+}
 

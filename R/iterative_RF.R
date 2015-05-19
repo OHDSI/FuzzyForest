@@ -2,7 +2,6 @@
 #'
 #' Fits iterative random forest algorithm.  Returns
 #' data.frame with variable importances and top rated features.
-#' @export
 #' @param X                 A data.frame.
 #'                          Each column corresponds to a feature vectors.
 #' @param y                 Response vector.
@@ -86,7 +85,6 @@ iterative_RF <- function(X, y, drop_fraction, keep_fraction, mtry_factor,
 #'
 #' Carries out selection step of fuzzyforest algorithm.  Returns
 #' data.frame with variable importances and top rated features.
-#' @export
 #' @param X                 A data.frame.
 #'                          Each column corresponds to a feature vectors.
 #'                          Could include additional covariates not a part of

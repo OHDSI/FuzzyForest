@@ -72,4 +72,28 @@ fuzzy forest object.
 \note{
 This work was partially funded by NSF IIS 1251151.
 }
+\examples{
+library(WGCNA)
+library(randomForest)
+data(Liver_Expr)
+set.seed(3653)
+y <- Liver_Expr$weight
+X <- Liver_Expr[, -1]
+screen_params <- screen_control(min_ntree=5000, keep_fraction=.25)
+select_params <- select_control(min_ntree=5000, number_selected=10)
+# fit fuzzy forests
+wff_fit <- wff(X, y, WGCNA_params = WGCNA_control(p=8),
+               screen_params = screen_params,
+               select_params = select_params,
+               final_ntree = 5000)
+
+#see which features have been selected along with their variable importance
+feature_list <- wff_fit$feature_list
+
+#see which modules are over represented in terms of their importance
+modplot(wff_fit)
+
+#produce dotplot to obtain a visual representation of the variable importance measures.
+varImpPlot(wff_fit$final_rf)
+}
 

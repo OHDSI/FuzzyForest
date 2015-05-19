@@ -82,6 +82,7 @@ predict.fuzzy_forest <- function(object, new_data, ...) {
 #'                      or character matrix with first column giving
 #'                      the current name of module and second column giving
 #'                      the assigned name of each module.
+#' @examples
 modplot <- function(object, main=NULL, xlab=NULL, ylab=NULL,
                               module_labels=NULL) {
   if(is.null(main)) {

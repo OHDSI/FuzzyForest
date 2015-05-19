@@ -185,7 +185,7 @@ X_train <- X[-test_ind, ]
 y_train <- y[-test_ind]
 WGCNA_params <- WGCNA_control(p=6, minModuleSize=30, TOMType = "unsigned",
                               reassignThreshold = 0, mergeCutHeight = 0.25,
-                              numericLabels = TRUE, pamRespectsDendro = FALSE)
+                              numericLabels = FALSE, pamRespectsDendro = FALSE)
 mtry_factor <- 5; drop_fraction <- .25; number_selected <- 30
 keep_fraction <- .1; min_ntree <- 5000; ntree_factor <- 5
 final_ntree <- 25000;
