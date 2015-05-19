@@ -28,7 +28,4 @@ features fall into each module.  In particular, it is easy to
 determine which module is over-represented in the group of selected
 features.
 }
-\examples{
-a = 1 + 1
-}
 
