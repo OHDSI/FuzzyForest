@@ -35,10 +35,6 @@ To install these packages, type the following command into the R console:
 ```{r eval=FALSE}
 setRepositories(ind=1:2)  
 install.packages("WGCNA")
-```
-For Windows operating systems, we've experienced further issues.
-In addition to the previous lines of code, type the following into console:
-```{r eval=FALSE}
 source("http://bioconductor.org/biocLite.R")
 biocLite("AnnotationDbi", type="source")
 biocLite("GO.db")

@@ -1,5 +1,5 @@
 ## Test environments
-* local OS X install, R version 3.1.2 (2014-10-31)
+* local OS X install, R version 3.2.0 (2014-10-31)
 * win-builder (devel and release)
 
 ## R CMD check results
@@ -14,5 +14,5 @@ There were 2 NOTES:
 
 After changing my ~/.Rprofile to include 
 "options(repos = c(CRAN="http://cran.r-project.org"))"
-the second note went away on the local test 
-environment
+the second note went away for the local test 
+environment.
