@@ -42,33 +42,42 @@
 #' #ff is handy if the user wants to test out multiple settings of WGCNA
 #' #prior to running fuzzy forests.
 #' library(WGCNA)
+#' library(mvtnorm)
 #' library(randomForest)
-#' y <- Liver_Expr$weight
-#' X <- Liver_Expr[, -1]
-#' net = blockwiseModules(X, power = 7,
-#'                        TOMType = "unsigned", minModuleSize = 30,
-#'                        reassignThreshold = 0, mergeCutHeight = 0.25,
-#'                        numericLabels = TRUE, pamRespectsDendro = FALSE,
-#'                        verbose = 0)
+#' library(fuzzyforest)
+#' data(ctg)
+#' y <- ctg$NSP
+#' X <- ctg[, 2:22]
+#'
+#' #set tuning parameters for WGCNA
+#' net = blockwiseModules(X, power = 6, minModuleSize = 1)
+#'
+#' #extract module membership for each covariate
 #' module_membership <- net$colors
-#' data(Liver_Expr)
-#' set.seed(3653)
 #'
-#' screen_params <- screen_control(min_ntree=5000, keep_fraction=.25)
-#' select_params <- select_control(min_ntree=5000, number_selected=10)
+#' #set tuning parameters
+#' mtry_factor <- 1; min_ntree <- 500;  drop_fraction <- .5; ntree_factor <- 1
+#' screen_params <- screen_control(drop_fraction = drop_fraction,
+#'                                 keep_fraction = .25, min_ntree = min_ntree,
+#'                                 ntree_factor = ntree_factor,
+#'                                 mtry_factor = mtry_factor)
+#' select_params <- select_control(drop_fraction = drop_fraction,
+#'                                 number_selected = 5,
+#'                                 min_ntree = min_ntree,
+#'                                 ntree_factor = ntree_factor,
+#'                                 mtry_factor = mtry_factor)
+#'
+#' #fit fuzzy forests
 #' ff_fit <- ff(X, y, module_membership = module_membership,
-#'              screen_params = screen_params,
-#'              select_params = select_params,
-#'              final_ntree = 5000)
+#'                 screen_params = screen_params,
+#'                 select_params = select_params,
+#'                 final_ntree = 500)
 #'
-#' #see which features have been selected along with their variable importance
-#' feature_list <- ff_fit$feature_list
+#' #extract variable importance rankings
+#' vims <- ff_fit$feature_list
 #'
-#' #see which modules are over represented in terms of their importance
+#' #plot results
 #' modplot(ff_fit)
-#'
-#' #produce dotplot to obtain a visual representation of the variable importance measures.
-#' varImpPlot(ff_fit$final_rf)
 #' @note This work was partially funded by NSF IIS 1251151.
 ff <- function(X, y, Z=NULL, module_membership,
                         screen_params = screen_control(min_ntree=5000),
@@ -89,9 +98,11 @@ ff <- function(X, y, Z=NULL, module_membership,
   screen_control <- screen_params
   select_control <-  select_params
   module_list <- unique(module_membership)
-  cl = parallel::makeCluster(num_processors)
-  doParallel::registerDoParallel(cl)
-  on.exit(parallel::stopCluster(cl))
+  if(num_processors > 1) {
+    cl = parallel::makeCluster(num_processors)
+    doParallel::registerDoParallel(cl)
+    on.exit(parallel::stopCluster(cl))
+  }
   survivors <- vector('list', length(module_list))
   drop_fraction <- screen_control$drop_fraction
   mtry_factor <- screen_control$mtry_factor
@@ -125,11 +136,18 @@ ff <- function(X, y, Z=NULL, module_membership,
     #TUNING PARAMETER keep_fraction
     target = ceiling(num_features * keep_fraction)
     while (num_features >= target){
-      rf = `%dopar%`(foreach(ntree = rep(ntree/num_processors, num_processors)
-                     , .combine = combine, .packages = 'randomForest'),
-                     #second argument to '%dopar%'
-                     randomForest(module , y, ntree = ntree, mtry = mtry,
-                     importance = TRUE, scale = FALSE, nodesize=nodesize))
+      if(num_processors > 1) {
+        rf = `%dopar%`(foreach(ntree = rep(ntree/num_processors, num_processors)
+                       , .combine = combine, .packages = 'randomForest'),
+                       #second argument to '%dopar%'
+                       randomForest(module , y, ntree = ntree, mtry = mtry,
+                       importance = TRUE, scale = FALSE, nodesize=nodesize))
+      }
+      if(num_processors == 1) {
+        rf <- randomForest(module, y, ntree = ntree, mtry = mtry,
+                           importance = TRUE, scale = FALSE,
+                           nodesize = nodesize)
+      }
       var_importance <- importance(rf, type=1, scale=FALSE)
       var_importance <- var_importance[order(var_importance[, 1],
                                              decreasing=TRUE), ,drop=FALSE]
@@ -268,27 +286,33 @@ ff <- function(X, y, Z=NULL, module_membership,
 #' It also includes the random forest fit using the selected features.
 #' @examples
 #' library(WGCNA)
+#' library(mvtnorm)
 #' library(randomForest)
-#' data(Liver_Expr)
-#' set.seed(3653)
-#' y <- Liver_Expr$weight
-#' X <- Liver_Expr[, -1]
-#' screen_params <- screen_control(min_ntree=5000, keep_fraction=.25)
-#' select_params <- select_control(min_ntree=5000, number_selected=10)
-#' # fit fuzzy forests
-#' wff_fit <- wff(X, y, WGCNA_params = WGCNA_control(p=8),
-#'                screen_params = screen_params,
-#'                select_params = select_params,
-#'                final_ntree = 5000)
+#' library(fuzzyforest)
+#' data(ctg)
+#' y <- ctg$NSP
+#' X <- ctg[, 2:22]
+#' WGCNA_params <- WGCNA_control(p=6, minModuleSize=1)
+#' mtry_factor <- 1; min_ntree <- 500;  drop_fraction <- .5; ntree_factor <- 1
+#' screen_params <- screen_control(drop_fraction = drop_fraction,
+#'                                 keep_fraction = .25, min_ntree = min_ntree,
+#'                                 ntree_factor = ntree_factor,
+#'                                 mtry_factor = mtry_factor)
+#' select_params <- select_control(drop_fraction = drop_fraction,
+#'                                 number_selected = 5,
+#'                                 min_ntree = min_ntree,
+#'                                 ntree_factor = ntree_factor,
+#'                                 mtry_factor = mtry_factor)
+#' wff_fit <- wff(X, y, WGCNA_params=WGCNA_params,
+#'                 screen_params=screen_params,
+#'                 select_params=select_params,
+#'                 final_ntree=500)
 #'
-#' #see which features have been selected along with their variable importance
-#' feature_list <- wff_fit$feature_list
+#' #extract variable importance rankings
+#' vims <- wff_fit$feature_list
 #'
-#' #see which modules are over represented in terms of their importance
+#' #plot results
 #' modplot(wff_fit)
-#'
-#' #produce dotplot to obtain a visual representation of the variable importance measures.
-#' varImpPlot(wff_fit$final_rf)
 #' @note This work was partially funded by NSF IIS 1251151.
 wff <- function(X, y, Z=NULL, WGCNA_params=WGCNA_control(p=6),
                         screen_params=screen_control(min_ntree=5000),
@@ -300,13 +324,13 @@ wff <- function(X, y, Z=NULL, WGCNA_params=WGCNA_control(p=6),
     stop("WGCNA must be loaded and attached. Type library(WGCNA) to do so.",
       call. = FALSE)
   }
-  if (!is.vector(y)) {
+  if (!(is.vector(y) || is.factor(y))) {
     stop("y must be vector")
   }
   integer_test <- sapply(X, is.integer)
   if( sum(integer_test) > 0 ) {
     ints <- which(integer_test == TRUE)
-    X[, ints] <- as.numeric(X[, ints])
+    X[, ints] <- apply(X[, ints, drop=FALSE], 2, as.numeric)
   }
   numeric_test <- sapply(X, is.numeric)
   if (sum(numeric_test) != dim(X)[2]) {

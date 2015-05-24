@@ -30,3 +30,20 @@ NULL
 #' @usage data(Liver_Expr)
 #' @format A data frame with 66 rows and 3601
 NULL
+
+#' Cardiotocography Data Set
+#'
+#' A data set containing measurements of fetal heart rate and uterine
+#' contraction from cardiotocograms.  This data set was obtained from
+#' the [UCI machine learning repository](https://archive.ics.uci.edu/ml/index.html)
+#' For our examples we extract a random sub sample of 100 observations.
+#'
+#' @docType data
+#' @keywords datasets
+#' @name ctg
+#' @usage data(ctg)
+#' @format A data frame with 100 rows and 21.
+NULL
+
+
+
