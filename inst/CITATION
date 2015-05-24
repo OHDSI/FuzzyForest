@@ -1,0 +1,13 @@
+citHeader("To cite package 'fuzzyforest' in publication use:")
+
+citEntry(entry = "Article",
+  author = personList(as.person("Daniel Conn"), as.person("Tuck Ngun"), as.person("Christina M. Ramirez")),
+  title = "Fuzzy forests: a new WGCNA based random forest algorithm for correlated, high-dimensional data",
+  year = 2015,
+  journal = "Journal of Statistical Software",
+  textVersion =
+    paste("Daniel Conn, Tuck Ngun, Christina M. Ramirez (2015).",
+    "Fuzzy forests: a new WGCNA based random forest algorithm for
+      correlated, high-dimensional data,", "Journal of Statistical Software,",
+      "Manuscript in progress"))
+
