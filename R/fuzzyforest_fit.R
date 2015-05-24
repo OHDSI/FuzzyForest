@@ -91,10 +91,23 @@ ff <- function(X, y, Z=NULL, module_membership,
            call. = FALSE)
     }
   }
+  if (!(is.vector(y) || is.factor(y))) {
+    stop("y must be vector or factor")
+  }
   if(!is.data.frame(X)) {
     stop("X must be a data.frame.", call. = FALSE)
   }
   CLASSIFICATION <- is.factor(y)
+  if(CLASSIFICATION == TRUE) {
+    if(missing(nodesize)){
+      nodesize <- 1
+    }
+  }
+  if(CLASSIFICATION == FALSE) {
+    if(missing(nodesize)){
+      nodesize <- 5
+    }
+  }
   screen_control <- screen_params
   select_control <-  select_params
   module_list <- unique(module_membership)
@@ -325,8 +338,9 @@ wff <- function(X, y, Z=NULL, WGCNA_params=WGCNA_control(p=6),
       call. = FALSE)
   }
   if (!(is.vector(y) || is.factor(y))) {
-    stop("y must be vector")
+    stop("y must be vector or factor")
   }
+  #WGCNA yields errors if X is an integer, here we convert integers to numeric.
   integer_test <- sapply(X, is.integer)
   if( sum(integer_test) > 0 ) {
     ints <- which(integer_test == TRUE)
