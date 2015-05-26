@@ -39,6 +39,12 @@ fetus.  It takes on 3 different values (N=normal; S=suspect; P=pathologic).
 
 ## Installing WGCNA
 In order to use WGCNA with `fuzzyforest`, packages from Bioconductor must be installed.
+
+```{r, echo=FALSE}
+require(knitr)
+opts_chunk$set(eval = FALSE)
+```
+
 To install these packages, type the following command into the R console:
 ```{r eval=FALSE}
 setRepositories(ind=1:2)  
@@ -52,11 +58,10 @@ the following link: http://labs.genetics.ucla.edu/horvath/CoexpressionNetwork/Rp
 
 ## Attaching Required Packages
 In general, the packages `WGCNA` and `randomForest` must be attached to take full advantage of `fuzzyforest`'s functionality.  
-```{r message=FALSE, results='hide'}
+```{r message=FALSE, results='hide', eval=TRUE}
 library(WGCNA)
 library(randomForest)
 library(fuzzyforest)
-library(foreach)
 ```
 
 
@@ -64,7 +69,7 @@ library(foreach)
 To use the function `ff`, we first need to obtain a partitioning of the
 features into distinct clusters.  In this vignette, we use WGCNA to partition
 the features.
-```{r, warning=FALSE, results='hide',fig.show='hold', cache=FALSE}
+```{r, warning=FALSE, results='hide',fig.show='hold'}
 #set seed so that results are reproducible
 set.seed(1)
 
@@ -90,9 +95,10 @@ of features surviving this initial screening step.
 Note that because there are only 21 covariates `minModuleSize` must be set to 1
 (by default it is 30).  
 ```{r, warning=FALSE, results='hide',fig.show='hold'}
-net = blockwiseModules(X, power = 6, minModuleSize = 1)
+net = blockwiseModules(X, power = 6, minModuleSize = 1, nThreads = 1)
 module_membership <- net$colors
 mtry_factor <- 1; min_ntree <- 500;  drop_fraction <- .5; ntree_factor <- 1
+nodesize <- 1; final_ntree <- 500
 screen_params <- screen_control(drop_fraction = drop_fraction,
                                  keep_fraction = .25, min_ntree = min_ntree,
                                 ntree_factor = ntree_factor,
@@ -139,7 +145,7 @@ be set larger than 1 for the sake computational speed or to prevent memory
 issues.
 
 Fuzzy forests is then fit using the function ``ff``:
-```{r, warning=FALSE, results='hide',fig.show='hold', cache=FALSE}
+```{r, warning=FALSE, results='hide',fig.show='hold'}
 ff_fit <- ff(X, NSP, module_membership = module_membership,
             screen_params = screen_params, select_params=select_params,
             final_ntree = 500)
@@ -151,8 +157,8 @@ Ideally, the resulting modules should be scientifically meaningful.
 For convenience and to make it easier to get started using fuzzy forests,
 `wff` automatically carries out WGCNA.  Parameters for WGCNA are input through 
 the object `WGCNA_params`
-```{r, warning=FALSE, results='hide',fig.show='hold', cache=FALSE, eval=FALSE}
-WGCNA_params <- WGCNA_control(p = 6, minModuleSize = 1)
+```{r, warning=FALSE, results='hide',fig.show='hold'}
+WGCNA_params <- WGCNA_control(p = 6, minModuleSize = 1, nThreads = 1)
 wff_fit <- wff(X, NSP, WGCNA_params = WGCNA_params,
               screen_params = screen_params,
               select_params = select_params,
@@ -160,13 +166,21 @@ wff_fit <- wff(X, NSP, WGCNA_params = WGCNA_params,
               num_processors = 1, nodesize = nodesize)
 ```
 
+```{r, echo=FALSE, eval=TRUE}
+ff_fit <- example_ff
+```
+
 `wff` and `ff` both return objects of type `fuzzy_forest`, a list containing
 the results of fuzzy forests.  A list of the top $k$ features is returned in
 a `data.frame` via the following call:
-```{r, warning=FALSE, fig.show='hold'}
+```{r, warning=FALSE, fig.show='hold', eval=TRUE}
 rankings <- ff_fit$feature_list
 rankings
 ```
+The highest ranked feature is ASTV or "percentage of time with abnormal long
+term variability." Followed by "mean value of short term variability", 
+"histogram mean", "mean value of long term variability", and "minimum of FHR
+histogram."
 
 After features are selected, a random forest is fit using these selected features.
 This random forest is accessed by the following command and can be used to 
@@ -174,31 +188,31 @@ obtain predictions for new data.  Note that the mse
 reported below is overly optimistic.  For classification, the reported 
 error rates will also be overly optimistic.
 The recursive feature elimination biases the usual out of bag error rate. 
-```{r, warning=FALSE, fig.show='hold'}
+```{r, warning=FALSE, fig.show='hold', eval=TRUE}
 final_rf <- ff_fit$final_rf
 final_rf_mse <- tail(final_rf$mse, 1)
 ```
-```{r, warning=FALSE, results='hold', echo=FALSE, fig.show='hold'}
+```{r, warning=FALSE, results='hold', echo=FALSE, fig.show='hold', eval=TRUE}
 cat(" warning!", "\n", "biased estimate of the mse:", final_rf_mse)
 ```
 
 The function `modplot` may be applied to objects of type `fuzzy_forest` to 
 obtain a graph depicting which modules are over-represented in the list of the 
-most important features.  In this case, module 1 appears to be highly 
+most important features.  In this case, the turquoise module appears to be slightly
 over-represented.
-```{r, warning=FALSE, results='hide',fig.show='hold',fig.width=11, fig.height=9}
+```{r, warning=FALSE, results='hide',fig.show='hold',fig.width=11, fig.height=9, eval=TRUE}
 modplot(ff_fit)
 ```
 
 or
 
-```{r, warning=FALSE, results='hide',fig.show='hide', eval=FALSE}
+```{r, warning=FALSE, results='hide',fig.show='hide'}
 modplot(wff_fit)
 ```
 
 The variable importances of the selected features can be graphically 
 displayed by using the function `varImpPlot` from the package `randomForest`.
-```{r, warning=FALSE, results='hide',fig.show='hold',fig.width=11,fig.height=9}
+```{r, warning=FALSE, results='hide',fig.show='hold',fig.width=11,fig.height=9, eval=TRUE}
 varImpPlot(final_rf)
 ```
 

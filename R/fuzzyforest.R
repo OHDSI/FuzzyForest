@@ -46,4 +46,15 @@ NULL
 NULL
 
 
+#' Fuzzy Forest Example
+#'
+#' An example of a fuzzy_forest object derived from fitting fuzzy forests
+#' on the ctg data set.  The source code used to produce example_ff can be
+#' seen in the vignette "fuzzyforest_introduction".
+#' @docType data
+#' @keywords R object
+#' @name example_ff
+#' @format .RData
+NULL
+
 
