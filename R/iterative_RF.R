@@ -113,8 +113,10 @@ select_RF <- function(X, y, drop_fraction, number_selected, mtry_factor,
                       ntree_factor, min_ntree,
                       num_processors, nodesize) {
   selection_list <- list()
-  cl = parallel::makeCluster(num_processors)
-  doParallel::registerDoParallel(cl)
+  if(num_processors > 1) {
+    cl = parallel::makeCluster(num_processors)
+    doParallel::registerDoParallel(cl)
+  }
   num_features <- ncol(X)
   mtry <- min(ceiling(mtry_factor*sqrt(num_features)), dim(X)[2])
   ntree <- max(num_features*ntree_factor, min_ntree)
@@ -122,12 +124,20 @@ select_RF <- function(X, y, drop_fraction, number_selected, mtry_factor,
   current_X <- X
   i <- 1
   while (num_features >= target){
-    rf = `%dopar%`(foreach(ntree = rep(ntree/num_processors, num_processors)
-                           , .combine = combine, .packages = 'randomForest'),
-                   #second argument to '%dopar%'
-                   randomForest(current_X , y, ntree = ntree, mtry = mtry,
-                                importance = TRUE, scale = FALSE,
-                                nodesize=nodesize))
+    if(num_processors > 1) {
+      rf = `%dopar%`(foreach(ntree = rep(ntree/num_processors, num_processors)
+                             , .combine = combine, .packages = 'randomForest'),
+                     #second argument to '%dopar%'
+                     randomForest(current_X , y, ntree = ntree, mtry = mtry,
+                                  importance = TRUE, scale = FALSE,
+                                  nodesize=nodesize))
+    }
+    #browser()
+    if(num_processors == 1) {
+      rf <- randomForest(current_X, y, ntree = ntree, mtry = mtry,
+                         importance = TRUE, scale = FALSE,
+                         nodesize = nodesize)
+    }
     var_importance <- rf$importance
     var_importance <- var_importance[order(var_importance[, 1],
                                            decreasing=TRUE), ]
@@ -155,7 +165,9 @@ select_RF <- function(X, y, drop_fraction, number_selected, mtry_factor,
       names(selection_list[[i]]) <- c("feature_name", "variable_importance")
     }
   }
-  parallel::stopCluster(cl)
+  if(num_processors > 1) {
+    parallel::stopCluster(cl)
+  }
   out <- list(feature_list, selection_list)
   return(out)
 }
