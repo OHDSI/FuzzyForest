@@ -53,4 +53,9 @@ screen_params <- screen_control(drop_fraction=drop_fraction,
                                 min_ntree=min_ntree,
                                 ntree_factor=ntree_factor)
 }
+\references{
+Daniel Conn, Tuck Ngun, Christina M. Ramirez (2015). Fuzzy Forests: a New
+WGCNA Based Random Forest Algorithm for Correlated, High-Dimensional Data,
+Journal of Statistical Software, Manuscript in progress.
+}
 

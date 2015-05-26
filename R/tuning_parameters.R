@@ -23,6 +23,10 @@
 #'                          \code{ntree_factor}*p).
 #' @param min_ntree         Minimum number of trees grown in each random forest.
 #' @return An object of type screen_control.
+#' @references
+#' Daniel Conn, Tuck Ngun, Christina M. Ramirez (2015). Fuzzy Forests: a New
+#' WGCNA Based Random Forest Algorithm for Correlated, High-Dimensional Data,
+#' Journal of Statistical Software, Manuscript in progress.
 #' @examples
 #' drop_fraction <- .25
 #' keep_fraction <- .1
@@ -72,6 +76,10 @@ screen_control <- function(drop_fraction=.25, keep_fraction=.05,
 #'                          \code{ntree_factor}*\code{p}).
 #' @param min_ntree         Minimum number of trees grown in each random forest.
 #' @return An object of type selection_control.
+#' @references
+#' Daniel Conn, Tuck Ngun, Christina M. Ramirez (2015). Fuzzy Forests: a New
+#' WGCNA Based Random Forest Algorithm for Correlated, High-Dimensional Data,
+#' Journal of Statistical Software, Manuscript in progress.
 #' @examples
 #' drop_fraction <- .25
 #' number_selected <- 10
@@ -108,6 +116,10 @@ select_control <- function(drop_fraction=.25, number_selected=5,
 #'                          See \code{\link[WGCNA]{blockwiseModules}} for
 #'                          details.
 #' @return An object of type WGCNA_control.
+#' @references
+#' Bin Zhang and Steve Horvath (2005) "A General Framework for Weighted Gene
+#' Co-Expression Network Analysis", Statistical Applications in Genetics and
+#' Molecular Biology: Vol. 4: No. 1, Article 17
 #' @examples
 #' WGCNA_params <- WGCNA_control(p=7, minModuleSize=30, TOMType = "unsigned",
 #'                               reassignThreshold = 0, mergeCutHeight = 0.25,

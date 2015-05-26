@@ -29,4 +29,9 @@ WGCNA_params <- WGCNA_control(p=7, minModuleSize=30, TOMType = "unsigned",
                               reassignThreshold = 0, mergeCutHeight = 0.25,
                               numericLabels = TRUE, pamRespectsDendro = FALSE)
 }
+\references{
+Bin Zhang and Steve Horvath (2005) "A General Framework for Weighted Gene
+Co-Expression Network Analysis", Statistical Applications in Genetics and
+Molecular Biology: Vol. 4: No. 1, Article 17
+}
 

@@ -37,12 +37,21 @@
 #' object is a list containing useful output of fuzzy forests.
 #' In particular it contains a data.frame with list of selected features.
 #' It also includes the random forest fit using the selected features.
+#' @references
+#' Leo Breiman (2001). Random Forests. Machine Learning, 45(1), 5-32.
+#'
+#' Daniel Conn, Tuck Ngun, Christina M. Ramirez (2015). Fuzzy Forests: a New
+#' WGCNA Based Random Forest Algorithm for Correlated, High-Dimensional Data,
+#' Journal of Statistical Software, Manuscript in progress.
+#'
+#' Bin Zhang and Steve Horvath (2005) "A General Framework for Weighted Gene
+#' Co-Expression Network Analysis", Statistical Applications in Genetics and
+#' Molecular Biology: Vol. 4: No. 1, Article 17
 #' @examples
 #' #ff requires that the partition of the covariates be previously determined.
 #' #ff is handy if the user wants to test out multiple settings of WGCNA
 #' #prior to running fuzzy forests.
 #' library(WGCNA)
-#' library(mvtnorm)
 #' library(randomForest)
 #' library(fuzzyforest)
 #' data(ctg)
@@ -50,7 +59,8 @@
 #' X <- ctg[, 2:22]
 #'
 #' #set tuning parameters for WGCNA
-#' net = blockwiseModules(X, power = 6, minModuleSize = 1)
+#' net = blockwiseModules(X, power = 6, minModuleSize = 1, nThreads = 1)
+#'
 #'
 #' #extract module membership for each covariate
 #' module_membership <- net$colors
@@ -68,6 +78,7 @@
 #'                                 mtry_factor = mtry_factor)
 #'
 #' #fit fuzzy forests
+#' \donttest{
 #' ff_fit <- ff(X, y, module_membership = module_membership,
 #'                 screen_params = screen_params,
 #'                 select_params = select_params,
@@ -78,6 +89,7 @@
 #'
 #' #plot results
 #' modplot(ff_fit)
+#' }
 #' @note This work was partially funded by NSF IIS 1251151.
 ff <- function(X, y, Z=NULL, module_membership,
                         screen_params = screen_control(min_ntree=5000),
@@ -297,15 +309,24 @@ ff <- function(X, y, Z=NULL, module_membership,
 #' object is a list containing useful output of fuzzy forests.
 #' In particular it contains a data.frame with list of selected features.
 #' It also includes the random forest fit using the selected features.
+#' @references
+#' Leo Breiman (2001). Random Forests. Machine Learning, 45(1), 5-32.
+#'
+#' Daniel Conn, Tuck Ngun, Christina M. Ramirez (2015). Fuzzy Forests: a New
+#' WGCNA Based Random Forest Algorithm for Correlated, High-Dimensional Data,
+#' Journal of Statistical Software, Manuscript in progress.
+#'
+#' Bin Zhang and Steve Horvath (2005) "A General Framework for Weighted Gene
+#' Co-Expression Network Analysis", Statistical Applications in Genetics and
+#' Molecular Biology: Vol. 4: No. 1, Article 17
 #' @examples
 #' library(WGCNA)
-#' library(mvtnorm)
 #' library(randomForest)
 #' library(fuzzyforest)
 #' data(ctg)
 #' y <- ctg$NSP
 #' X <- ctg[, 2:22]
-#' WGCNA_params <- WGCNA_control(p=6, minModuleSize=1)
+#' WGCNA_params <- WGCNA_control(p = 6, minModuleSize = 1, nThreads = 1)
 #' mtry_factor <- 1; min_ntree <- 500;  drop_fraction <- .5; ntree_factor <- 1
 #' screen_params <- screen_control(drop_fraction = drop_fraction,
 #'                                 keep_fraction = .25, min_ntree = min_ntree,
@@ -316,16 +337,18 @@ ff <- function(X, y, Z=NULL, module_membership,
 #'                                 min_ntree = min_ntree,
 #'                                 ntree_factor = ntree_factor,
 #'                                 mtry_factor = mtry_factor)
-#' wff_fit <- wff(X, y, WGCNA_params=WGCNA_params,
-#'                 screen_params=screen_params,
-#'                 select_params=select_params,
-#'                 final_ntree=500)
+#' \donttest{
+#' wff_fit <- wff(X, y, WGCNA_params = WGCNA_params,
+#'                 screen_params = screen_params,
+#'                 select_params = select_params,
+#'                 final_ntree = 500)
 #'
 #' #extract variable importance rankings
 #' vims <- wff_fit$feature_list
 #'
 #' #plot results
 #' modplot(wff_fit)
+#' }
 #' @note This work was partially funded by NSF IIS 1251151.
 wff <- function(X, y, Z=NULL, WGCNA_params=WGCNA_control(p=6),
                         screen_params=screen_control(min_ntree=5000),

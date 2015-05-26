@@ -69,7 +69,6 @@ This work was partially funded by NSF IIS 1251151.
 #ff is handy if the user wants to test out multiple settings of WGCNA
 #prior to running fuzzy forests.
 library(WGCNA)
-library(mvtnorm)
 library(randomForest)
 library(fuzzyforest)
 data(ctg)
@@ -77,7 +76,8 @@ y <- ctg$NSP
 X <- ctg[, 2:22]
 
 #set tuning parameters for WGCNA
-net = blockwiseModules(X, power = 6, minModuleSize = 1)
+net = blockwiseModules(X, power = 6, minModuleSize = 1, nThreads = 1)
+
 
 #extract module membership for each covariate
 module_membership <- net$colors
@@ -95,6 +95,7 @@ select_params <- select_control(drop_fraction = drop_fraction,
                                 mtry_factor = mtry_factor)
 
 #fit fuzzy forests
+\donttest{
 ff_fit <- ff(X, y, module_membership = module_membership,
                 screen_params = screen_params,
                 select_params = select_params,
@@ -105,5 +106,17 @@ vims <- ff_fit$feature_list
 
 #plot results
 modplot(ff_fit)
+}
+}
+\references{
+Leo Breiman (2001). Random Forests. Machine Learning, 45(1), 5-32.
+
+Daniel Conn, Tuck Ngun, Christina M. Ramirez (2015). Fuzzy Forests: a New
+WGCNA Based Random Forest Algorithm for Correlated, High-Dimensional Data,
+Journal of Statistical Software, Manuscript in progress.
+
+Bin Zhang and Steve Horvath (2005) "A General Framework for Weighted Gene
+Co-Expression Network Analysis", Statistical Applications in Genetics and
+Molecular Biology: Vol. 4: No. 1, Article 17
 }
 
