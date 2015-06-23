@@ -10,7 +10,7 @@ the package `WGCNA`.
 * the latest released version can be downloaded from CRAN: 
   `install.packages("fuzzyforest")`
 * the latest development version can be downloaded from github:
-  `install_github("OHDSI/FuzzyForests")`
+  `install_github("OHDSI/FuzzyForest")`
 
 To enable use of the full functionality of `fuzzyforest` packages `WGCNA`
 must be installed.  However, `WGCNA` requires the installation of a few
