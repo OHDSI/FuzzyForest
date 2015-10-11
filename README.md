@@ -2,19 +2,19 @@
 
 `fuzzyforest` is an extension of random forests designed to yield less biased
 variable importance rankings when features are correlated with one another.
-The algorithm requires that features be partitioned into seperate groups
-or modules such that the correlation within groups are large and the 
+The algorithm requires that features be partitioned into separate groups
+or modules such that the correlation within groups is large and the 
 correlation between groups is small.  `fuzzyforest` allows for easy integration
-the package `WGCNA`.
+with the package `WGCNA`.
 
 * the latest released version can be downloaded from CRAN: 
   `install.packages("fuzzyforest")`
 * the latest development version can be downloaded from github:
   `install_github("OHDSI/FuzzyForest")`
 
-To enable use of the full functionality of `fuzzyforest` packages `WGCNA`
+To enable use of the full functionality of `fuzzyforest`, the package `WGCNA`
 must be installed.  However, `WGCNA` requires the installation of a few
-packages form bioConductor.  To install `WGCNA`, type the following lines
+packages from bioConductor.  To install `WGCNA`, type the following lines
 into the console:
 ```{r}
 setRepositories(ind=1:2)  
